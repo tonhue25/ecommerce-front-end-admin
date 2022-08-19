@@ -1,29 +1,28 @@
 import { Link } from 'react-router-dom';
-// import Toast from '../../../src/components/Toast';
-function CategoryItem({ data, deleteCategory }) {
+function CustomerItem({ data, deleteItem }) {
     return (
         <tr>
-            <td style={{ width: '20%', justifyContent: 'center' }}>
-                <p className="avatar-lg ">
-                    <img src={data.image} className="avatar-img rounded-circle" />
-                </p>
-            </td>
-            <td style={{ width: '30%' }}>{data.id}</td>
-            <td style={{ width: '30%' }}>{data.name}</td>
-            <td style={{ width: '40%' }}>
+            <td>{data.cardId}</td>
+            <td>{data.name}</td>
+            <td>{data.email}</td>
+            <td>{data.phoneNumber}</td>
+            <td>{data.status}</td>
+            <td>{data.address}</td>
+            <td>
                 <div className="form-button-action">
                     <button
                         type="button"
+                        data-toggle="tooltip"
                         title="Edit"
                         className="btn btn-link btn-primary btn-lg"
                         data-original-title="Edit Task"
                     >
-                        <Link to={'/update-category/' + data.id}>
+                        <Link to={'/update-customer/' + data.cardId}>
                             <i className="fa fa-edit"></i>
                         </Link>
                     </button>
                     <button
-                        onClick={() => deleteCategory(data.id)}
+                        onClick={() => deleteItem(data.id)}
                         type="button"
                         data-toggle="tooltip"
                         title="Remove"
@@ -38,4 +37,4 @@ function CategoryItem({ data, deleteCategory }) {
     );
 }
 
-export default CategoryItem;
+export default CustomerItem;

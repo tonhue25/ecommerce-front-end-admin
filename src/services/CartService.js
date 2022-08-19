@@ -1,9 +1,12 @@
-import { request_user } from './base_url';
+import { request_user, request_admin } from './base_url';
 
-export const getAllCarts = async (state) => {
-    const res = await request_user.get(`/carts/all`, {
+export const getAllCarts = async (page, size, state, customer) => {
+    const res = await request_admin.get(`/carts`, {
         params: {
-            state: state,
+            page,
+            size,
+            state,
+            customer,
         },
     });
     return res;

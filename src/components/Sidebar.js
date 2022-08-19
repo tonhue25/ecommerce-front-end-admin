@@ -45,17 +45,27 @@ function Sidebar() {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to={'/danh-muc'}>
+                            <Link to={'/categories'}>
                                 <p>Danh mục</p>
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to={'/nha-cung-cap'}>
+                            <Link to={'/employees'}>
+                                <p>Nhân viên</p>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to={'/customers'}>
+                                <p>Khách hàng</p>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to={'/'}>
                                 <p>Nhà cung cấp</p>
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to={'/don-hang'}>
+                            <Link to={'/invoices'}>
                                 <i className="fas fa-desktop" />
                                 <p>Đơn hàng</p>
                             </Link>

@@ -1,65 +1,56 @@
 import { useEffect, useState } from 'react';
-import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
 import { PAGE_SIZE } from '../../services/constant';
-import * as CategoryService from '../../services/CategoryService';
-import * as SupplierService from '../../services/SupplierService';
-import CategoryItem from '../Category/CategoryItem';
-function Categories() {
+import CustomerItem from './../Customer/CustomerItem';
+import * as CustomerService from '../../services/CustomerService';
+import { Pagination } from '@mui/material';
+import Toast from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+function Customers() {
     const [page, setPage] = useState(1);
-    const [categories, setCategories] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [suppliers, setSuppliers] = useState([]);
+    const [customers, setCustomers] = useState([]);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
-    const [searchCategory, setSearchCategory] = useState('');
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
     const [isDelete, setIsDelete] = useState(false);
 
-    function ShowCategories(categories) {
-        return categories.map((item) => <CategoryItem data={item} />);
+    useEffect(() => {
+        const getListCustomers = async () => {
+            const result = await CustomerService.getListCustomers(page, itemDisplay, searchValue, 'false');
+            setCustomers(result.data.list);
+            setTotalPages(result.data.totalPages);
+            return result.data;
+        };
+        getListCustomers();
+    }, [page, itemDisplay, searchValue, isDelete]);
+
+    function ShowCustomers(customers) {
+        return customers.map((item) => (
+            <CustomerItem key={item.cardId} data={item} deleteItem={() => deleteItem(item.cardId, item.status)} />
+        ));
     }
 
-    useEffect(() => {
-        const getAllCategories = async () => {
-            const result = await CategoryService.getAllCategories();
-            setCategories(result.data);
-            console.log(result.data);
-            return result.data;
-        };
-        getAllCategories();
-    }, []);
-
-    useEffect(() => {
-        const getAllSuppliers = async () => {
-            const result = await SupplierService.getAllSuppliers();
-            setSuppliers(result.data);
-            console.log(result.data);
-            return result.data;
-        };
-        getAllSuppliers();
-    }, []);
-
-    const deleteProduct = (id, status) => {
-        if (status == 1) {
+    const deleteItem = (id, status) => {
+        if (status == 'true') {
             const deleteItem = async () => {
-                const result = await ProductService.deleteItem(id);
+                const result = await CustomerService.deleteItem(id);
                 setIsDelete(true);
-                // Toast('success', 'Successfully deleted!!');
+                Toast('success', 'Đã xóa khách hàng!!');
             };
             deleteItem();
             setIsDelete(false);
         } else {
-            // Toast('warning', 'Product was deleted!!');
+            Toast('warning', 'Khách hàng này đã xóa!!');
         }
     };
 
-    const handleChangeCategory = (e) => {
-        setSearchCategory(e.target.value);
-    };
+    function handleChange(page) {
+        setPage(page);
+    }
 
     return (
         <div className="main-panel">
+            <ToastContainer />
             <div className="content">
                 <div className="page-inner">
                     <div className="row">
@@ -108,7 +99,7 @@ function Categories() {
                                         <br />
                                         <div className="col-md-2 col-lg-2">
                                             <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-category'} style={{ color: 'white' }}>
+                                                <Link to={'/update-customer'} style={{ color: 'white' }}>
                                                     <i className="fa fa-plus " /> Add
                                                 </Link>
                                             </button>
@@ -118,14 +109,33 @@ function Categories() {
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Ảnh</th>
                                                     <th>Mã</th>
                                                     <th>Tên</th>
+                                                    <th>Email</th>
+                                                    <th>Số điện thoại</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Địa chỉ</th>
+                                                    <th>Trạng thái</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{ShowCategories(categories)}</tbody>
+                                            <tbody>{ShowCustomers(customers)}</tbody>
                                         </table>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {totalPages > 1 ? (
+                                            <Pagination
+                                                color="secondary"
+                                                count={totalPages}
+                                                size="large"
+                                                page={page}
+                                                showFirstButton
+                                                showLastButton
+                                                onChange={(e, page) => handleChange(page)}
+                                            />
+                                        ) : (
+                                            <></>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -136,5 +146,4 @@ function Categories() {
         </div>
     );
 }
-
-export default Categories;
+export default Customers;

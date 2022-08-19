@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
+import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
 import * as StateService from '../../services/StateService';
-import Paging from '../../components/Paging';
 import * as CartService from '../../services/CartService';
-import axios from 'axios';
-import CartItem from './CartItem';
+import { Pagination } from '@mui/material';
+import * as constant from '../../services/constant';
 function Carts() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
     const [searchState, setSearchState] = useState(0);
-    const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
+    const [searchCustomer, setSearchCustomer] = useState('');
+    // const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
     const [carts, setCarts] = useState([]);
     const [states, setStates] = useState({});
-    const [length, setLength] = useState();
 
-    const [isConfirm, setIsConfirm] = useState(false);
+    // const [isConfirm, setIsConfirm] = useState(false);
 
     useEffect(() => {
         const getAllStates = async () => {
@@ -33,13 +32,13 @@ function Carts() {
 
     useEffect(() => {
         const getAllCarts = async () => {
-            const result = await CartService.getAllCarts(searchState);
-            setCarts(result.data);
-            setLength(result.data.length);
-            return result.data;
+            const result = await CartService.getAllCarts(page, PAGE_SIZE, searchState, searchCustomer);
+            setCarts(result.data.list);
+            setTotalPages(result.data.totalPages);
+            return result.data.list;
         };
         getAllCarts();
-    }, [searchState, isConfirm]);
+    }, [searchState, page]);
 
     const showState = () => {
         const Items = [];
@@ -57,113 +56,11 @@ function Carts() {
         return Items;
     };
 
-    // xac nhan don hang.
-    // cartid => status.
+    function handleChange(page) {
+        setPage(page);
+    }
 
-    const handleClickConfirm = (cartId, status) => {
-        let stateChange;
-        if (status == 1) {
-            stateChange = 2;
-        } else if (status == 2) {
-            stateChange = 3;
-        } else if (status == 3) {
-            stateChange = 4;
-        } else if (status == 4) {
-            stateChange = 5;
-        } else if (status == 5) {
-            stateChange = 6;
-        } else if (status == 6) {
-            stateChange = 7;
-        } else if (status == 7) {
-            stateChange = 8;
-        }
-        setIsConfirm(true);
-        axios
-            .put(`http://localhost:8080/api/user/cart-details/${cartId}?status=${status}&statusChange=${stateChange}`)
-            .catch(function (error) {
-                console.log(error);
-            });
-        setIsConfirm(false);
-        axios.put(`http://localhost:8080/api/user/carts/${cartId}?statusChange=${stateChange}`).catch(function (error) {
-            console.log(error);
-        });
-        setIsConfirm(true);
-    };
-
-    const handleClickCancel = (cartId, status) => {
-        let stateChange = 7;
-        setIsConfirm(true);
-        axios
-            .put(`http://localhost:8080/api/user/cart-details/${cartId}?status=${status}&statusChange=${stateChange}`)
-            .catch(function (error) {
-                console.log(error);
-            });
-        setIsConfirm(false);
-        axios.put(`http://localhost:8080/api/user/carts/${cartId}?statusChange=${stateChange}`).catch(function (error) {
-            console.log(error);
-        });
-        setIsConfirm(true);
-    };
-
-    const showCart = () => {
-        if (length > 0) {
-            const Items = [];
-            for (let i = 0; i < carts.length; ++i) {
-                for (let j = 0; j < carts[i].list.length; ++j) {
-                    Items.push(
-                        <CartItem
-                            key={carts[i].list[j].productId + '' + carts[i].list[j].cartId}
-                            data={carts[i].list[j]}
-                        />,
-                    );
-                }
-                Items.push(
-                    <>
-                        <tr>
-                            <td>Tổng tiền</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>{carts[i].total} đ</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button
-                                    className={
-                                        carts[i].list[0].status >= 6 || carts[i].list[0].status == 1
-                                            ? 'btn btn-primary btn-round ml-auto disabled'
-                                            : 'btn btn-primary btn-round ml-auto active'
-                                    }
-                                    key={carts[i].list[0].cartId + '' + carts[i].list[0].productId}
-                                    onClick={() => handleClickConfirm(carts[i].list[0].cartId, carts[i].list[0].status)}
-                                >
-                                    <i /> Xác nhận
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                    onClick={() => handleClickCancel(carts[i].list[0].cartId, carts[i].list[0].status)}
-                                    className={
-                                        carts[i].list[0].status >= 6 || carts[i].list[0].status == 1
-                                            ? 'btn btn-danger btn-round ml-auto disabled'
-                                            : 'btn btn-danger btn-round ml-auto active'
-                                    }
-                                >
-                                    <i /> Hủy
-                                </button>
-                            </td>
-                        </tr>
-                    </>,
-                );
-            }
-            return Items;
-        }
-    };
+    // handle click confirm. change state
 
     return (
         <div className="main-panel">
@@ -190,7 +87,7 @@ function Carts() {
                                         </div>
                                         <div className="col-md-4 col-lg-6"></div>
                                         <div className="col-md-2 col-lg-2">
-                                            <div className="form-group form-group-default">
+                                            {/* <div className="form-group form-group-default">
                                                 <div className="form-group">
                                                     <label>Số sản phẩm</label>
                                                     <select
@@ -203,7 +100,7 @@ function Carts() {
                                                         <option>20</option>
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>
@@ -226,31 +123,63 @@ function Carts() {
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
-                                        <div className="col-md-2 col-lg-2">
-                                            <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-product'} style={{ color: 'white' }}>
-                                                    <i className="fa fa-plus " /> Add
-                                                </Link>
-                                            </button>
-                                        </div>
                                     </div>
                                     <div className="table-responsive">
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Tên khách hàng</th>
-                                                    <th>Ảnh</th>
-                                                    <th>Tên sản phẩm</th>
-                                                    <th>Số lượng</th>
-                                                    <th>Giá</th>
+                                                    <th>Đơn hàng</th>
+                                                    <th>Khách hàng</th>
+                                                    <th>Ngày tạo</th>
+                                                    <th>Ngày giao</th>
+                                                    <th>Xác nhận</th>
+                                                    <th>Vận chuyển</th>
                                                     <th>Trạng thái</th>
-                                                    <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{showCart()}</tbody>
+                                            <tbody>
+                                                {carts.map((item) => (
+                                                    <tr key={item.id}>
+                                                        <td>{item.id}</td>
+                                                        <td>{item.customerName}</td>
+                                                        <td>{item.createDate}</td>
+                                                        <td>{item.dateDelivery}</td>
+                                                        <td>{item.employeeConfirm}</td>
+                                                        <td>{item.employeeDelivery}</td>
+                                                        <td>{constant.convertState(item.status)}</td>
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Edit"
+                                                                className="btn btn-link btn-primary btn-lg"
+                                                                data-original-title="Edit Task"
+                                                            >
+                                                                <Link to={`/don-hang/${item.id}`}>
+                                                                    <i className="fa fa-eye"></i>
+                                                                </Link>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
                                         </table>
                                     </div>
-                                    {/* {Paging(page, totalPages, handleClickPageNext)} */}
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {totalPages > 1 ? (
+                                            <Pagination
+                                                color="secondary"
+                                                count={totalPages}
+                                                size="large"
+                                                page={page}
+                                                showFirstButton
+                                                showLastButton
+                                                onChange={(e, page) => handleChange(page)}
+                                            />
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

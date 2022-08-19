@@ -2,64 +2,78 @@ import { useEffect, useState } from 'react';
 import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
 import { PAGE_SIZE } from '../../services/constant';
-import * as CategoryService from '../../services/CategoryService';
-import * as SupplierService from '../../services/SupplierService';
-import CategoryItem from '../Category/CategoryItem';
-function Categories() {
+import EmployeeItem from './../Employee/EmployeeItem';
+import * as EmployeeService from '../../services/EmployeeService';
+import { Pagination } from '@mui/material';
+import Toast from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+import * as DepartmentService from '../../services/DepartmentService';
+function Employees() {
     const [page, setPage] = useState(1);
-    const [categories, setCategories] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [products, setProducts] = useState([]);
-    const [suppliers, setSuppliers] = useState([]);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
-    const [searchCategory, setSearchCategory] = useState('');
+    const [searchDepartment, setSearchDepartment] = useState('');
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
     const [isDelete, setIsDelete] = useState(false);
 
-    function ShowCategories(categories) {
-        return categories.map((item) => <CategoryItem data={item} />);
+    useEffect(() => {
+        const getListEmployee = async () => {
+            const result = await EmployeeService.getListEmployee(
+                page,
+                itemDisplay,
+                searchValue,
+                'false',
+                searchDepartment,
+            );
+            setProducts(result.data.list);
+            setTotalPages(result.data.totalPages);
+            return result.data;
+        };
+        getListEmployee();
+    }, [page, itemDisplay, searchValue, searchDepartment, isDelete]);
+
+    function ShowProducts(products) {
+        return products.map((item) => (
+            <EmployeeItem key={item.id} data={item} deleteItem={() => deleteItem(item.id, item.status)} />
+        ));
     }
 
     useEffect(() => {
-        const getAllCategories = async () => {
-            const result = await CategoryService.getAllCategories();
-            setCategories(result.data);
-            console.log(result.data);
+        const getAllDepartments = async () => {
+            const result = await DepartmentService.getAllDepartments();
+            setDepartments(result.data);
             return result.data;
         };
-        getAllCategories();
+        getAllDepartments();
     }, []);
 
-    useEffect(() => {
-        const getAllSuppliers = async () => {
-            const result = await SupplierService.getAllSuppliers();
-            setSuppliers(result.data);
-            console.log(result.data);
-            return result.data;
-        };
-        getAllSuppliers();
-    }, []);
-
-    const deleteProduct = (id, status) => {
-        if (status == 1) {
+    const deleteItem = (id, status) => {
+        if (status == 'true') {
             const deleteItem = async () => {
-                const result = await ProductService.deleteItem(id);
+                const result = await EmployeeService.deleteItem(id);
                 setIsDelete(true);
-                // Toast('success', 'Successfully deleted!!');
+                Toast('success', 'Đã xóa nhân viên!!');
             };
             deleteItem();
             setIsDelete(false);
         } else {
-            // Toast('warning', 'Product was deleted!!');
+            Toast('warning', 'Nhân viên đã xóa!!');
         }
     };
 
-    const handleChangeCategory = (e) => {
-        setSearchCategory(e.target.value);
+    const handleChangeDepartment = (e) => {
+        setSearchDepartment(e.target.value);
     };
+
+    function handleChange(page) {
+        setPage(page);
+    }
 
     return (
         <div className="main-panel">
+            <ToastContainer />
             <div className="content">
                 <div className="page-inner">
                     <div className="row">
@@ -67,7 +81,24 @@ function Categories() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div className="col-md-6 col-lg-4"></div>
+                                        <div className="col-md-6 col-lg-4">
+                                            <div className="form-group form-group-default">
+                                                <div className="form-group">
+                                                    <label>Danh mục</label>
+                                                    <select
+                                                        className="form-control form-control"
+                                                        onChange={handleChangeDepartment}
+                                                    >
+                                                        <option value="">Tất cả</option>
+                                                        {departments.map((item) => (
+                                                            <option key={item.id} value={item.id}>
+                                                                {item.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className="col-md-4 col-lg-6"></div>
                                         <div className="col-md-2 col-lg-2">
                                             <div className="form-group form-group-default">
@@ -108,7 +139,7 @@ function Categories() {
                                         <br />
                                         <div className="col-md-2 col-lg-2">
                                             <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-category'} style={{ color: 'white' }}>
+                                                <Link to={'/update-employee'} style={{ color: 'white' }}>
                                                     <i className="fa fa-plus " /> Add
                                                 </Link>
                                             </button>
@@ -118,14 +149,33 @@ function Categories() {
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Ảnh</th>
                                                     <th>Mã</th>
                                                     <th>Tên</th>
+                                                    <th>Email</th>
+                                                    <th>Ngày sinh</th>
+                                                    <th>Địa chỉ</th>
+                                                    <th>Bộ phận</th>
+                                                    <th>Trạng thái</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{ShowCategories(categories)}</tbody>
+                                            <tbody>{ShowProducts(products)}</tbody>
                                         </table>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {totalPages > 1 ? (
+                                            <Pagination
+                                                color="secondary"
+                                                count={totalPages}
+                                                size="large"
+                                                page={page}
+                                                showFirstButton
+                                                showLastButton
+                                                onChange={(e, page) => handleChange(page)}
+                                            />
+                                        ) : (
+                                            <></>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -136,5 +186,4 @@ function Categories() {
         </div>
     );
 }
-
-export default Categories;
+export default Employees;

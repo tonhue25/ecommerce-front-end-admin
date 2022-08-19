@@ -124,7 +124,7 @@ function Header() {
                                     </div>
                                 </li>
                                 <li>
-                                    <a className="see-all" href="javascript:void(0);">
+                                    <a className="see-all" href="">
                                         See all messages
                                         <i className="fa fa-angle-right" />{' '}
                                     </a>
@@ -192,7 +192,7 @@ function Header() {
                                     </div>
                                 </li>
                                 <li>
-                                    <a className="see-all" href="javascript:void(0);">
+                                    <a className="see-all" href="">
                                         See all notifications
                                         <i className="fa fa-angle-right" />{' '}
                                     </a>

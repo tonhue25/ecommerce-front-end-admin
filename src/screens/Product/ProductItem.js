@@ -12,7 +12,7 @@ function ProductItem({ data, deleteProduct }) {
             <td>{data.name}</td>
             <td>{data.inventoryNumber}</td>
             <td>{data.price}</td>
-            <td>{data.status == 1 ? 'Còn hàng' : 'Hết hàng'}</td>
+            <td>{data.status === 'true' ? 'Còn hàng' : 'Hết hàng'}</td>
             <td>
                 <div className="form-button-action">
                     <button

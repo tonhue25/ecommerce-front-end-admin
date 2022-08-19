@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { PAGE_SIZE } from '../../services/constant';
 import ProductItem from './ProductItem';
 import * as CategoryService from '../../services/CategoryService';
-import Paging from '../../components/Paging';
+import { Pagination } from '@mui/material';
+import Toast from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
 function Products() {
     const [page, setPage] = useState(1);
     const [categories, setCategories] = useState([]);
@@ -23,7 +25,7 @@ function Products() {
             return result.data;
         };
         getListProduct();
-    }, [page, itemDisplay, searchValue, searchCategory]);
+    }, [page, itemDisplay, searchValue, searchCategory, isDelete]);
 
     function ShowProducts(products) {
         return products.map((item) => (
@@ -41,16 +43,16 @@ function Products() {
     }, []);
 
     const deleteProduct = (id, status) => {
-        if (status == 1) {
+        if (status == 'true') {
             const deleteItem = async () => {
                 const result = await ProductService.deleteItem(id);
                 setIsDelete(true);
-                // Toast('success', 'Successfully deleted!!');
+                Toast('success', 'Đã xóa sản phẩm!!');
             };
             deleteItem();
             setIsDelete(false);
         } else {
-            // Toast('warning', 'Product was deleted!!');
+            Toast('warning', 'Sản phẩm đã xóa!!');
         }
     };
 
@@ -58,12 +60,13 @@ function Products() {
         setSearchCategory(e.target.value);
     };
 
-    function handleClickPageNext(page) {
+    function handleChange(page) {
         setPage(page);
     }
 
     return (
         <div className="main-panel">
+            <ToastContainer />
             <div className="content">
                 <div className="page-inner">
                     <div className="row">
@@ -151,7 +154,21 @@ function Products() {
                                             <tbody>{ShowProducts(products)}</tbody>
                                         </table>
                                     </div>
-                                    {Paging(page, totalPages, handleClickPageNext)}
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {totalPages > 1 ? (
+                                            <Pagination
+                                                color="secondary"
+                                                count={totalPages}
+                                                size="large"
+                                                page={page}
+                                                showFirstButton
+                                                showLastButton
+                                                onChange={(e, page) => handleChange(page)}
+                                            />
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

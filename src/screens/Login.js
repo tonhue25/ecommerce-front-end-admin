@@ -1,0 +1,84 @@
+import Toast from '../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+import Redirect from '../utils/Redirect';
+import { admin_url } from '../services/base_url';
+
+function Login({ setAccessToken }) {
+    // const navigate = useNavigate();
+    const [id, setId] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        const url = `${admin_url}/login`;
+        try {
+            const response = await axios.post(url, {
+                id: id,
+                password: password,
+            });
+            localStorage.setItem('accessToken', JSON.stringify(response.data));
+            setAccessToken(localStorage.getItem('accessToken'));
+            Toast('success', 'Đăng nhập thành công!');
+            setTimeout(() => Redirect(''), 3000);
+        } catch (err) {
+            Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+        }
+    };
+
+    return (
+        <div>
+            <div className="page-inner">
+                <ToastContainer />
+                <div className="col-md-12">
+                    <div className="card" style={{ textAlign: 'center' }}>
+                        <form>
+                            <div className="card-header">
+                                <div className="card-title">Login</div>
+                            </div>
+                            <div className="card-body">
+                                <div className="row">
+                                    <div className="col-md-4 col-lg-4"></div>
+                                    <div className="col-md-4 col-lg-4" style={{ textAlign: 'left' }}>
+                                        <div className="form-group">
+                                            <div className="input-icon">
+                                                <span className="input-icon-addon">
+                                                    <i className="fa fa-user" />
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Username"
+                                                    onChange={(e) => setId(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="password">Password</label>
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                placeholder="Password"
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-4 col-lg-4"></div>
+                                </div>
+                            </div>
+                            <div className="card-action">
+                                <button onClick={handleLogin} className="btn btn-info" style={{ width: '200px' }}>
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Login;
