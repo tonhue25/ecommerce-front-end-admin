@@ -1,42 +1,73 @@
 import { useEffect, useState } from 'react';
+import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
-import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
+import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
+import ProductItem from '../Product/ProductItem';
 import * as CategoryService from '../../services/CategoryService';
-import CategoryItem from '../Category/CategoryItem';
 import { Pagination } from '@mui/material';
-function Categories() {
+import Toast from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+import InventoryItem from './InventoryItem';
+function InventoryProduct() {
     const [page, setPage] = useState(PAGE_ONE);
     const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
+    const [searchCategory, setSearchCategory] = useState('');
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
-
-    function ShowCategories(categories) {
-        return categories.map((item) => <CategoryItem data={item} />);
-    }
+    const [isDelete, setIsDelete] = useState(false);
 
     useEffect(() => {
-        const getListCategories = async () => {
-            const result = await CategoryService.getListCategories(page, itemDisplay, searchValue);
-            setCategories(result.data.list);
+        const getListProduct = async () => {
+            const result = await ProductService.getListProduct(page, itemDisplay, 0, searchValue, searchCategory);
+            setProducts(result.data.list);
             setTotalPages(result.data.totalPages);
             return result.data;
         };
-        getListCategories();
-    }, [page, itemDisplay, searchValue]);
+        getListProduct();
+    }, [page, itemDisplay, searchValue, searchCategory, isDelete]);
+
+    function ShowProducts(products) {
+        return products.map((item) => (
+            <InventoryItem key={item.id} data={item} deleteProduct={() => deleteProduct(item.id, item.status)} />
+        ));
+    }
+
+    useEffect(() => {
+        const getAllCategories = async () => {
+            const result = await CategoryService.getAllCategories();
+            setCategories(result.data);
+            return result.data;
+        };
+        getAllCategories();
+    }, []);
+
+    const deleteProduct = (id, status) => {
+        if (status == 'true') {
+            const deleteItem = async () => {
+                const result = await ProductService.deleteItem(id);
+                setIsDelete(true);
+                Toast('success', 'Đã xóa sản phẩm!!');
+            };
+            deleteItem();
+            setIsDelete(false);
+        } else {
+            Toast('warning', 'Sản phẩm đã xóa!!');
+        }
+    };
+
+    const handleChangeCategory = (e) => {
+        setSearchCategory(e.target.value);
+    };
 
     function handleChange(page) {
         setPage(page);
     }
 
-    useEffect(() => {
-        if (searchValue) {
-            setPage(PAGE_ONE);
-        }
-    }, [searchValue]);
-
     return (
         <div className="main-panel">
+            <ToastContainer />
             <div className="content">
                 <div className="page-inner">
                     <div className="row">
@@ -44,16 +75,29 @@ function Categories() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div
-                                            className="col-md-10 col-lg-10"
-                                            style={{ display: 'flex', justifyContent: 'center' }}
-                                        >
-                                            <h3>Quản lý danh mục</h3>
+                                        <div className="col-md-6 col-lg-4">
+                                            <div className="form-group form-group-default">
+                                                <div className="form-group">
+                                                    <label>Danh mục</label>
+                                                    <select
+                                                        className="form-control form-control"
+                                                        onChange={handleChangeCategory}
+                                                    >
+                                                        <option value="">Tất cả</option>
+                                                        {categories.map((item) => (
+                                                            <option key={item.id} value={item.id}>
+                                                                {item.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <div className="col-md-4 col-lg-6"></div>
                                         <div className="col-md-2 col-lg-2">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
-                                                    <label>Số item hiển thị</label>
+                                                    <label>Số sản phẩm</label>
                                                     <select
                                                         className="form-control"
                                                         onChange={(e) => setItemDisplay(e.target.value)}
@@ -77,7 +121,7 @@ function Categories() {
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
-                                                    placeholder="Nhập tên..."
+                                                    placeholder="Nhập tên sản phẩm..."
                                                 />
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
@@ -87,24 +131,27 @@ function Categories() {
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
-                                        <div className="col-md-2 col-lg-2">
-                                            <Link to={'/update-category'} style={{ color: 'white' }}>
-                                                <button className="btn btn-primary btn-round ml-auto">
-                                                    <i className="fa fa-plus " /> Thêm danh mục
-                                                </button>
-                                            </Link>
-                                        </div>
+                                        {/* <div className="col-md-2 col-lg-2">
+                                            <button className="btn btn-primary btn-round ml-auto">
+                                                <Link to={'/update-product'} style={{ color: 'white' }}>
+                                                    <i className="fa fa-plus " /> Add
+                                                </Link>
+                                            </button>
+                                        </div> */}
                                     </div>
                                     <div className="table-responsive">
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Ảnh</th>
                                                     <th>Mã</th>
-                                                    <th>Tên</th>
+                                                    <th>Ảnh</th>
+                                                    <th>Tên sản phẩm</th>
+                                                    <th>Số lượng tồn</th>
+                                                    <th></th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{ShowCategories(categories)}</tbody>
+                                            <tbody>{ShowProducts(products)}</tbody>
                                         </table>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -132,4 +179,4 @@ function Categories() {
     );
 }
 
-export default Categories;
+export default InventoryProduct;

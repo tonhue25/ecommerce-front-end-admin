@@ -58,23 +58,11 @@ function Customers() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div className="col-md-6 col-lg-4"></div>
-                                        <div className="col-md-4 col-lg-6"></div>
-                                        <div className="col-md-2 col-lg-2">
-                                            <div className="form-group form-group-default">
-                                                <div className="form-group">
-                                                    <label>Số sản phẩm</label>
-                                                    <select
-                                                        className="form-control"
-                                                        onChange={(e) => setItemDisplay(e.target.value)}
-                                                    >
-                                                        <option>5</option>
-                                                        <option>10</option>
-                                                        <option>15</option>
-                                                        <option>20</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                        <div
+                                            className="col-md-12 col-lg-12"
+                                            style={{ display: 'flex', justifyContent: 'center' }}
+                                        >
+                                            <h3>Quản lý khách hàng</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -87,7 +75,7 @@ function Customers() {
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
-                                                    placeholder="Nhập tên sản phẩm..."
+                                                    placeholder="Nhập tên..."
                                                 />
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
@@ -98,11 +86,11 @@ function Customers() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-customer'} style={{ color: 'white' }}>
-                                                    <i className="fa fa-plus " /> Add
-                                                </Link>
-                                            </button>
+                                            <Link to={'/update-customer'} style={{ color: 'white' }}>
+                                                <button className="btn btn-primary btn-round ml-auto">
+                                                    <i className="fa fa-plus " /> Thêm khách hàng
+                                                </button>
+                                            </Link>
                                         </div>
                                     </div>
                                     <div className="table-responsive">
@@ -125,7 +113,7 @@ function Customers() {
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                                         {totalPages > 1 ? (
                                             <Pagination
-                                                color="secondary"
+                                                color="primary"
                                                 count={totalPages}
                                                 size="large"
                                                 page={page}

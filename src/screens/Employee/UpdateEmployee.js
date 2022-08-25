@@ -97,29 +97,29 @@ function UpdateEmployee() {
                             <form>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">Add new employee</div>
+                                        <div className="card-title">Thêm nhân viên mới</div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="id">employee id</label>
+                                                    <label htmlFor="id">Mã nhân viên</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter id"
+                                                        placeholder="Nhập mã"
                                                         name="id"
                                                         value={data.id || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Name</label>
+                                                    <label htmlFor="name">Tên nhân viên</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter name"
+                                                        placeholder="Nhập tên"
                                                         name="name"
                                                         value={data.name || ''}
                                                         onChange={onChange}
@@ -154,7 +154,7 @@ function UpdateEmployee() {
                                                     </select>
                                                 </div>
                                                 <div className="form-check mb-1 mt-1">
-                                                    <label>Status</label>
+                                                    <label>Trạng thái</label>
                                                     <br />
                                                     <div style={{ textAlign: 'center' }}>
                                                         <div name="status" onChange={onChange}>
@@ -190,26 +190,26 @@ function UpdateEmployee() {
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter price"
+                                                        placeholder="Nhập email"
                                                         name="email"
                                                         onChange={onChange}
                                                         value={data.email || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="quantity">Salary</label>
+                                                    <label htmlFor="quantity">Lương</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="number"
                                                         className="form-control"
-                                                        placeholder="Enter quantity"
+                                                        placeholder="Nhập lương"
                                                         name="salary"
                                                         onChange={onChange}
                                                         value={data.salary || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="description">Address</label>
+                                                    <label htmlFor="description">Địa chỉ</label>
                                                     <textarea
                                                         className="form-control"
                                                         rows={8}

@@ -3,26 +3,26 @@ import { Link } from 'react-router-dom';
 function CategoryItem({ data, deleteCategory }) {
     return (
         <tr>
-            <td style={{ width: '20%', justifyContent: 'center' }}>
+            <td style={{ width: '30%', justifyContent: 'center' }}>
                 <p className="avatar-lg ">
                     <img src={data.image} className="avatar-img rounded-circle" />
                 </p>
             </td>
             <td style={{ width: '30%' }}>{data.id}</td>
-            <td style={{ width: '30%' }}>{data.name}</td>
-            <td style={{ width: '40%' }}>
+            <td style={{ width: '20%' }}>{data.name}</td>
+            <td style={{ width: '20%' }}>
                 <div className="form-button-action">
-                    <button
-                        type="button"
-                        title="Edit"
-                        className="btn btn-link btn-primary btn-lg"
-                        data-original-title="Edit Task"
-                    >
-                        <Link to={'/update-category/' + data.id}>
+                    <Link to={'/update-category/' + data.id}>
+                        <button
+                            type="button"
+                            title="Edit"
+                            className="btn btn-link btn-primary btn-lg"
+                            data-original-title="Edit Task"
+                        >
                             <i className="fa fa-edit"></i>
-                        </Link>
-                    </button>
-                    <button
+                        </button>
+                    </Link>
+                    {/* <button
                         onClick={() => deleteCategory(data.id)}
                         type="button"
                         data-toggle="tooltip"
@@ -31,7 +31,7 @@ function CategoryItem({ data, deleteCategory }) {
                         data-original-title="Remove"
                     >
                         <i className="fa fa-times" />
-                    </button>
+                    </button> */}
                 </div>
             </td>
         </tr>

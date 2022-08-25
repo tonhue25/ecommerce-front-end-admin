@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PAGE_SIZE } from '../../services/constant';
 import * as CartDetailService from '../../services/CartDetailService';
+import * as EmployeeService from '../../services/EmployeeService';
 import axios from 'axios';
 import * as constant from '../../services/constant';
-import { user_url } from '../../services/base_url';
+import { admin_url, user_url } from '../../services/base_url';
+import CurrencyFormat from 'react-currency-format';
 function CartDetails() {
     let { id } = useParams();
 
-    const [searchState, setSearchState] = useState(0);
+    const [employees, setEmployees] = useState([]);
     const [cartDetails, setCartDetails] = useState([]);
     const [states, setStates] = useState();
     const [totals, setTotals] = useState();
-
+    const [searchState, setSearchState] = useState('shipping001');
     const [isUpdate, setIsUpdate] = useState(false);
 
     useEffect(() => {
@@ -20,30 +22,38 @@ function CartDetails() {
             const result = await CartDetailService.getDetailCart(id);
             setCartDetails(result.data.list);
             setTotals(result.data.total);
-            setStates(result.data.stateOfCart);
+            setStates(result.data.state);
             return result.data.list;
         };
         getDetailCart();
-    }, [searchState, isUpdate]);
+    }, [isUpdate]);
+
+    useEffect(() => {
+        const getAllEmployeeByDepartment = async () => {
+            const result = await EmployeeService.getAllEmployeeByDepartment('shipping');
+            setEmployees(result.data);
+            return result.data;
+        };
+        getAllEmployeeByDepartment();
+    }, []);
 
     const handleConfirm = (cartId, status) => {
         let statusChange;
-        if (status == constant.ACTIVE) {
-            statusChange = constant.WAIT;
-        } else if (status == constant.WAIT) {
-            statusChange = constant.PAID;
-        } else if (status == constant.PAID) {
+        if (status === constant.WAIT) {
             statusChange = constant.DELIVERING;
-        } else if (status == constant.DELIVERING) {
+        } else if (status === constant.DELIVERING) {
             statusChange = constant.DELIVERED;
         }
-        console.log(statusChange);
+        setIsUpdate(true);
+        let employeeConfirm = JSON.parse(localStorage.getItem('accessToken')).id;
         axios({
             method: 'put',
-            url: `${user_url}/cart-details/${cartId}`,
+            url: `${admin_url}/carts/${id}`,
             data: {
-                status,
-                statusChange,
+                id: cartId,
+                employeeConfirm: employeeConfirm,
+                employeeDelivery: searchState,
+                state: statusChange,
             },
         })
             .then(function (response) {
@@ -51,51 +61,13 @@ function CartDetails() {
             })
             .catch(function (error) {
                 console.log(error);
-            });
-        setIsUpdate(false);
-        axios
-            .put(`http://localhost:8080/api/user/carts/${cartId}?statusChange=${statusChange}`)
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function (response) {
-                setIsUpdate(true);
-            })
-            .catch(function (error) {
-                console.log(error);
+                setIsUpdate(false);
             });
         setIsUpdate(false);
     };
 
-    const handleClickCancel = (cartId, status) => {
-        let statusChange = constant.CANCEL;
-        axios({
-            method: 'put',
-            url: `${user_url}/cart-details/${cartId}`,
-            data: {
-                status,
-                statusChange,
-            },
-        })
-            .then(function (response) {
-                setIsUpdate(true);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        setIsUpdate(false);
-        axios
-            .put(`http://localhost:8080/api/user/carts/${cartId}?statusChange=${statusChange}`)
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function (response) {
-                setIsUpdate(true);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        setIsUpdate(false);
+    const handleChangeState = (e) => {
+        setSearchState(e.target.value);
     };
 
     return (
@@ -105,6 +77,33 @@ function CartDetails() {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="card">
+                                <div className="card-header">
+                                    <div className="d-flex align-items-center">
+                                        <div className="col-md-6 col-lg-4">
+                                            <div className="form-group form-group-default">
+                                                <div className="form-group">
+                                                    <label>Nhân viên giao hàng</label>
+                                                    <select
+                                                        className="form-control form-control"
+                                                        onChange={handleChangeState}
+                                                    >
+                                                        {employees.map((item) => (
+                                                            <option
+                                                                key={item.id}
+                                                                value={item.id}
+                                                                // selected={item.id === 'confirm003'}
+                                                            >
+                                                                {item.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-4 col-lg-6"></div>
+                                        <div className="col-md-2 col-lg-2"></div>
+                                    </div>
+                                </div>
                                 <div className="card-body">
                                     <div className="row p-3">
                                         <div
@@ -122,7 +121,7 @@ function CartDetails() {
                                         >
                                             <br />
                                             <div className="input-icon">
-                                                <h4>Trạng thái : {constant.convertState(states)}</h4>
+                                                <h4>Trạng thái : {states}</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -150,8 +149,22 @@ function CartDetails() {
                                                         </td>
                                                         <td>{data.productName}</td>
                                                         <td>x {data.quantity}</td>
-                                                        <td>{data.price} đ</td>
-                                                        <td>{data.quantity * data.price} đ</td>
+                                                        <td>
+                                                            <CurrencyFormat
+                                                                value={data.price}
+                                                                displayType={'text'}
+                                                                thousandSeparator={true}
+                                                                suffix={' đ '}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <CurrencyFormat
+                                                                value={data.quantity * data.price}
+                                                                displayType={'text'}
+                                                                thousandSeparator={true}
+                                                                suffix={' đ '}
+                                                            />
+                                                        </td>
                                                     </tr>
                                                 ))}
                                                 <tr>
@@ -159,13 +172,20 @@ function CartDetails() {
                                                     <td>Tổng tiền</td>
                                                     <td></td>
                                                     <td></td>
-                                                    <td>{totals} đ</td>
+                                                    <td>
+                                                        <CurrencyFormat
+                                                            value={totals}
+                                                            displayType={'text'}
+                                                            thousandSeparator={true}
+                                                            suffix={' đ '}
+                                                        />
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                     <div className="row p-3" style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {states < constant.DELIVERED ? (
+                                        {states != constant.DELIVERED ? (
                                             <div>
                                                 <button
                                                     className="btn btn-primary btn-round ml-auto mr-5"
@@ -174,12 +194,12 @@ function CartDetails() {
                                                     <i className="fa fa-check" /> Xác nhận
                                                 </button>
 
-                                                <button
-                                                    className="btn btn-danger btn-round ml-auto"
-                                                    onClick={() => handleClickCancel(id, states)}
-                                                >
-                                                    <i className="fa fa-trash" /> Hủy
-                                                </button>
+                                                {/* <button
+                                                className="btn btn-danger btn-round ml-auto"
+                                                onClick={() => handleClickCancel(id, states)}
+                                            >
+                                                <i className="fa fa-trash" /> Hủy
+                                            </button> */}
                                             </div>
                                         ) : (
                                             <></>

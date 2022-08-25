@@ -1,14 +1,25 @@
 import { Link } from 'react-router-dom';
+import Moment from 'moment';
 function EmployeeItem({ data, deleteItem }) {
+    const formatDate = Moment(data.birthday).format('DD/MM/YYYY');
     return (
         <tr>
             <td>{data.id}</td>
             <td>{data.name}</td>
             <td>{data.email}</td>
-            <td>{data.birthday}</td>
+            <td>{formatDate}</td>
             <td>{data.address}</td>
             <td>{data.department.name}</td>
-            <td>{data.status}</td>
+            <td>
+                <button
+                    type="button"
+                    className={
+                        data.status === 'true' ? 'btn-primary btn btn-link btn-lg' : 'btn-danger btn btn-link btn-lg'
+                    }
+                >
+                    {data.status === 'true' ? <i class="fa fa-check"></i> : <i className="fa fa-times" />}
+                </button>
+            </td>
             <td>
                 <div className="form-button-action">
                     <button

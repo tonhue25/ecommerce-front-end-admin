@@ -21,3 +21,8 @@ export const deleteItem = async (employeeId) => {
     const res = await request_admin.delete(`/employees/${employeeId}`);
     return res;
 };
+
+export const getAllEmployeeByDepartment = async (departmentId) => {
+    const res = await request_admin.get(`/employees/department/${departmentId}`);
+    return res;
+};

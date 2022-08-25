@@ -4,37 +4,41 @@ import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
 import * as StateService from '../../services/StateService';
 import * as CartService from '../../services/CartService';
 import { Pagination } from '@mui/material';
-function Carts() {
-    const [page, setPage] = useState(PAGE_ONE);
+import * as constant from '../../services/constant';
+function Imports() {
+    const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
-    const [searchState, setSearchState] = useState('');
+    const [searchState, setSearchState] = useState(0);
     const [searchCustomer, setSearchCustomer] = useState('');
+    // const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
     const [carts, setCarts] = useState([]);
     const [states, setStates] = useState({});
 
-    // useEffect(() => {
-    //     const getAllStates = async () => {
-    //         const result = await StateService.getAllStates();
-    //         setStates(result.data);
-    //         return result.data;
-    //     };
-    //     getAllStates();
-    // }, []);
+    // const [isConfirm, setIsConfirm] = useState(false);
+
+    useEffect(() => {
+        const getAllStates = async () => {
+            const result = await StateService.getAllStates();
+            setStates(result.data);
+            return result.data;
+        };
+        getAllStates();
+    }, []);
 
     const handleChangeState = (e) => {
         setSearchState(e.target.value);
     };
 
-    useEffect(() => {
-        const getAllCarts = async () => {
-            const result = await CartService.getAllCarts(page, PAGE_SIZE, searchState, searchCustomer);
-            setCarts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data.list;
-        };
-        getAllCarts();
-    }, [searchState, page]);
+    // useEffect(() => {
+    //     const getAllCarts = async () => {
+    //         const result = await CartService.getAllCarts(page, PAGE_SIZE, searchState, searchCustomer);
+    //         setCarts(result.data.list);
+    //         setTotalPages(result.data.totalPages);
+    //         return result.data.list;
+    //     };
+    //     getAllCarts();
+    // }, [searchState, page]);
 
     const showState = () => {
         const Items = [];
@@ -65,16 +69,6 @@ function Carts() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div
-                                            className="col-md-12 col-lg-12"
-                                            style={{ display: 'flex', justifyContent: 'center' }}
-                                        >
-                                            <h3>Quản lý đơn hàng</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* <div className="card-header">
-                                    <div className="d-flex align-items-center">
                                         <div className="col-md-6 col-lg-4">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
@@ -87,12 +81,12 @@ function Carts() {
                                                         {showState()}
                                                     </select>
                                                 </div>
-                                            </div> 
+                                            </div>
                                         </div>
                                         <div className="col-md-4 col-lg-6"></div>
                                         <div className="col-md-2 col-lg-2"></div>
                                     </div>
-                                </div> */}
+                                </div>
                                 <div className="card-body">
                                     <div className="row">
                                         <div className="col-md-6 col-lg-4">
@@ -102,7 +96,7 @@ function Carts() {
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
-                                                    placeholder="Nhập tên khách hàng..."
+                                                    placeholder="Nhập tên sản phẩm..."
                                                 />
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
@@ -112,49 +106,40 @@ function Carts() {
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
+                                        <div className="col-md-2 col-lg-2">
+                                            <button className="btn btn-primary btn-round ml-auto">
+                                                <Link to={'/detail-import'} style={{ color: 'white' }}>
+                                                    <i className="fa fa-plus " /> Add
+                                                </Link>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="table-responsive">
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th style={{ width: '10px' }}>Đơn hàng</th>
+                                                    <th>Đơn hàng</th>
                                                     <th>Khách hàng</th>
                                                     <th>Ngày mua</th>
                                                     <th>Ngày giao</th>
                                                     <th>Xác nhận</th>
                                                     <th>Vận chuyển</th>
                                                     <th>Địa chỉ</th>
-                                                    <th>Thanh toán</th>
                                                     <th>Trạng thái</th>
+                                                    <th>Sản phẩm</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {carts.map((item) => (
+                                                {/* {carts.map((item) => (
                                                     <tr key={item.id}>
-                                                        <td style={{ width: '10px' }}>{item.id}</td>
+                                                        <td>{item.id}</td>
                                                         <td>{item.customerName}</td>
                                                         <td>{item.createDate}</td>
                                                         <td>{item.dateDelivery}</td>
                                                         <td>{item.confirmName}</td>
                                                         <td>{item.deliveryName}</td>
                                                         <td>{item.addressDelivery}</td>
-                                                        <td>
-                                                            <button
-                                                                type="button"
-                                                                className={
-                                                                    item.isPaid === 'true'
-                                                                        ? 'btn-primary btn btn-link btn-lg'
-                                                                        : 'btn-danger btn btn-link btn-lg'
-                                                                }
-                                                            >
-                                                                {item.isPaid === 'true' ? (
-                                                                    <i className="fa fa-check"></i>
-                                                                ) : (
-                                                                    <i className="fa fa-times" />
-                                                                )}
-                                                            </button>
-                                                        </td>
-                                                        <td>{item.state}</td>
+                                                        <td>{constant.convertState(item.status)}</td>
                                                         <td>
                                                             <button
                                                                 type="button"
@@ -169,7 +154,7 @@ function Carts() {
                                                             </button>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                ))} */}
                                             </tbody>
                                         </table>
                                     </div>
@@ -198,4 +183,4 @@ function Carts() {
     );
 }
 
-export default Carts;
+export default Imports;

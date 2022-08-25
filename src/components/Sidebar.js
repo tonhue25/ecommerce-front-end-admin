@@ -1,41 +1,39 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import * as EmployeeService from '../services/EmployeeService';
 function Sidebar() {
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
+    const [data, setData] = useState({});
+    useEffect(() => {
+        if (accessToken) {
+            let employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
+            const getOne = async () => {
+                const result = await EmployeeService.getOne(employeeId);
+                setData(result.data);
+                return result.data;
+            };
+            getOne();
+        }
+    }, [accessToken]);
+
+    const handleClickLogout = () => {
+        localStorage.clear();
+    };
+
     return (
         <div className="sidebar sidebar-style-2">
             <div className="sidebar-wrapper scrollbar scrollbar-inner">
                 <div className="sidebar-content">
                     <div className="user">
-                        <div className="avatar-sm float-left mr-2">
-                            <img src="../../assets/img/profile.jpg" alt="..." className="avatar-img rounded-circle" />
-                        </div>
                         <div className="info">
                             <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                                 <span>
-                                    Hizrian
-                                    <span className="user-level">Administrator</span>
+                                    {'Xin chào :' + data.name}
+                                    <span className="user-level">{data.role}</span>
                                     <span className="caret" />
                                 </span>
                             </a>
                             <div className="clearfix" />
-                            <div className="collapse in" id="collapseExample">
-                                <ul className="nav">
-                                    <li>
-                                        <a href="#profile">
-                                            <span className="link-collapse">My Profile</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#edit">
-                                            <span className="link-collapse">Edit Profile</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#settings">
-                                            <span className="link-collapse">Settings</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                     <ul className="nav nav-primary">
@@ -60,15 +58,51 @@ function Sidebar() {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to={'/'}>
-                                <p>Nhà cung cấp</p>
+                            <Link to={'/invoices'}>
+                                <p>Đơn hàng</p>
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to={'/invoices'}>
-                                <i className="fas fa-desktop" />
-                                <p>Đơn hàng</p>
-                            </Link>
+                            <a data-toggle="collapse" href="#tables">
+                                <i className="fas fa-table" />
+                                <p>Thống kê</p>
+                                <span className="caret" />
+                            </a>
+                            <div className="collapse" id="tables">
+                                <ul className="nav nav-collapse">
+                                    <li>
+                                        <Link to={'/top-products'}>
+                                            <p>Sản phẩm bán chạy</p>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to={'/revenue-statistics'}>
+                                            <p>Thống kế doanh thu</p>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to={'/inventory-product'}>
+                                            <p>Sản phẩm tồn kho</p>
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li className="mx-4 mt-2">
+                            <a href="/">
+                                <button
+                                    className="btn btn-primary btn-block"
+                                    onClick={() => {
+                                        localStorage.clear();
+                                    }}
+                                >
+                                    <span className="btn-label mr-2">
+                                        {' '}
+                                        <i className="fas fa-sign-out-alt" />{' '}
+                                    </span>
+                                    Log out{' '}
+                                </button>
+                            </a>
                         </li>
                     </ul>
                 </div>

@@ -6,7 +6,16 @@ function CustomerItem({ data, deleteItem }) {
             <td>{data.name}</td>
             <td>{data.email}</td>
             <td>{data.phoneNumber}</td>
-            <td>{data.status}</td>
+            <td>
+                <button
+                    type="button"
+                    className={
+                        data.status === 'true' ? 'btn-primary btn btn-link btn-lg' : 'btn-danger btn btn-link btn-lg'
+                    }
+                >
+                    {data.status === 'true' ? <i class="fa fa-check"></i> : <i className="fa fa-times" />}
+                </button>
+            </td>
             <td>{data.address}</td>
             <td>
                 <div className="form-button-action">

@@ -51,6 +51,9 @@ function UpdateCategory() {
                 } else {
                     Toast('success', 'Thêm mới thành công!');
                 }
+                if (file) {
+                    uploadFile(response.data.id);
+                }
                 setTimeout(() => Redirect('categories'), 3000);
             })
             .catch((error) => {
@@ -72,6 +75,51 @@ function UpdateCategory() {
         });
     };
 
+    function uploadFile(id) {
+        const url = `${admin_url}/categories/image`;
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('file', file);
+        formData.append('fileName', file.name);
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+            },
+        };
+        axios
+            .post(url, formData, config)
+            .then((response) => {
+                // Toast('success', 'Successfully updated!!');
+            })
+            .catch((error) => {
+                Toast('error', 'Something went wrong : ' + error);
+            });
+    }
+
+    const [file, setFile] = useState();
+    const [selectedFile, setSelectedFile] = useState();
+    const [preview, setPreview] = useState();
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreview(undefined);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [selectedFile]);
+    const onSelectFile = (e) => {
+        if (!e.target.files || e.target.files.length === 0) {
+            setSelectedFile(undefined);
+            return;
+        }
+        setSelectedFile(e.target.files[0]);
+        setFile(e.target.files[0]);
+    };
+
     return (
         <div className="main-panel">
             <ToastContainer />
@@ -82,18 +130,18 @@ function UpdateCategory() {
                             <form onSubmit={handleUpdate}>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">{isUpdate ? data.name : 'New category'} </div>
+                                        <div className="card-title">{isUpdate ? data.name : 'Thêm mới danh mục'} </div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
                                             <div className="col-md-3 col-lg-3"></div>
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Id</label>
+                                                    <label htmlFor="name">Mã danh mục</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter id"
+                                                        placeholder="Nhập mã"
                                                         name="id"
                                                         value={data.id || ''}
                                                         disabled={isUpdate ? true : false}
@@ -101,18 +149,51 @@ function UpdateCategory() {
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Name</label>
+                                                    <label htmlFor="name">Tên danh mục</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter name"
+                                                        placeholder="Nhập tên"
                                                         name="name"
                                                         value={data.name || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <input type="file" className="form-control-file" />
+                                                    <input
+                                                        type="file"
+                                                        className="form-control-file"
+                                                        onChange={onSelectFile}
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <div className="row">
+                                                        <div className="col-4 col-sm-4"></div>
+                                                        <div className="col-4 col-sm-4">
+                                                            {selectedFile ? (
+                                                                <img
+                                                                    src={preview}
+                                                                    style={{
+                                                                        textAlign: 'center',
+                                                                        width: '200px',
+                                                                        height: '200px',
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <img
+                                                                    src={data.image || ''}
+                                                                    alt="title"
+                                                                    className=""
+                                                                    style={{
+                                                                        textAlign: 'center',
+                                                                        width: '200px',
+                                                                        height: '200px',
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        <div className="col-4 col-sm-4"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="col-md-3 col-lg-3"></div>
@@ -121,10 +202,10 @@ function UpdateCategory() {
 
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
-                                            {isUpdate ? 'Update' : 'Add'}
+                                            {isUpdate ? 'Cập nhập' : 'Thêm'}
                                         </button>
                                         <button type="cancel" className="btn btn-danger" onClick={handleClickCancel}>
-                                            Cancel
+                                            Hủy
                                         </button>
                                     </div>
                                 </div>

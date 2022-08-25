@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
+import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
 import ProductItem from './ProductItem';
 import * as CategoryService from '../../services/CategoryService';
 import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
 function Products() {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(PAGE_ONE);
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState();
@@ -57,12 +57,19 @@ function Products() {
     };
 
     const handleChangeCategory = (e) => {
+        setPage(PAGE_ONE);
         setSearchCategory(e.target.value);
     };
 
     function handleChange(page) {
         setPage(page);
     }
+
+    useEffect(() => {
+        if (searchValue) {
+            setPage(PAGE_ONE);
+        }
+    }, [searchValue]);
 
     return (
         <div className="main-panel">
@@ -72,6 +79,16 @@ function Products() {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="card">
+                                <div className="card-header">
+                                    <div className="d-flex align-items-center">
+                                        <div
+                                            className="col-md-12 col-lg-12"
+                                            style={{ display: 'flex', justifyContent: 'center' }}
+                                        >
+                                            <h3>Quản lý sản phẩm</h3>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
                                         <div className="col-md-6 col-lg-4">
@@ -116,7 +133,7 @@ function Products() {
                                         <div className="col-md-6 col-lg-4">
                                             <div className="input-icon">
                                                 <input
-                                                    value={searchValue}
+                                                    value={searchValue || ''}
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
@@ -131,11 +148,11 @@ function Products() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-product'} style={{ color: 'white' }}>
-                                                    <i className="fa fa-plus " /> Add
-                                                </Link>
-                                            </button>
+                                            <Link to={'/update-product'} style={{ color: 'white' }}>
+                                                <button className="btn btn-primary btn-round ml-auto">
+                                                    <i className="fa fa-plus " /> Thêm sản phẩm
+                                                </button>
+                                            </Link>
                                         </div>
                                     </div>
                                     <div className="table-responsive">
@@ -145,9 +162,11 @@ function Products() {
                                                     <th>Mã</th>
                                                     <th>Ảnh</th>
                                                     <th>Tên sản phẩm</th>
-                                                    <th>Số lượng tôn</th>
+                                                    <th></th>
+                                                    <th>Số lượng tồn</th>
                                                     <th>Giá</th>
                                                     <th>Trạng thái</th>
+                                                    <th>Bình luận</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -157,7 +176,7 @@ function Products() {
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                                         {totalPages > 1 ? (
                                             <Pagination
-                                                color="secondary"
+                                                color="primary"
                                                 count={totalPages}
                                                 size="large"
                                                 page={page}

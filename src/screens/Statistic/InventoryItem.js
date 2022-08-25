@@ -3,7 +3,7 @@ import { Rating } from '@mui/material';
 import * as ProductService from '../../services/ProductService';
 import { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
-function ProductItem({ data, deleteProduct }) {
+function InventoryItem({ data, deleteProduct }) {
     const [point, setPoint] = useState(0);
     useEffect(() => {
         const fetchApiGetPoint = async () => {
@@ -23,33 +23,19 @@ function ProductItem({ data, deleteProduct }) {
                 </p>
             </td>
             <td>{data.name}</td>
-            <td>
+            {/* <td>
                 {point > 0 ? (
                     <Rating precision={0.25} name="size-large" value={point || 0} size="small" readOnly />
                 ) : (
                     <span></span>
                 )}
-            </td>
+            </td> */}
             <td>
                 <CurrencyFormat value={data.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
-            <td>
+            {/* <td>
                 <CurrencyFormat value={data.price} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
-            </td>
-            <td>{data.status === true ? 'Còn hàng' : 'Hết hàng'}</td>
-            <td>
-                <button
-                    type="button"
-                    data-toggle="tooltip"
-                    title="Edit"
-                    className="btn btn-link btn-primary btn-lg"
-                    data-original-title="Edit Task"
-                >
-                    <Link to={`/comments/${data.id}`}>
-                        <i className="fa fa-eye"></i>
-                    </Link>
-                </button>
-            </td>
+            </td> */}
             <td>
                 <div className="form-button-action">
                     <button
@@ -63,20 +49,10 @@ function ProductItem({ data, deleteProduct }) {
                             <i className="fa fa-edit"></i>
                         </Link>
                     </button>
-                    <button
-                        onClick={() => deleteProduct(data.id)}
-                        type="button"
-                        data-toggle="tooltip"
-                        title="Remove"
-                        className="btn btn-link btn-danger"
-                        data-original-title="Remove"
-                    >
-                        <i className="fa fa-times" />
-                    </button>
                 </div>
             </td>
         </tr>
     );
 }
 
-export default ProductItem;
+export default InventoryItem;

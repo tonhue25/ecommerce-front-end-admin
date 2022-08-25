@@ -1,17 +1,18 @@
 export const PAGE_ONE = 1;
-export const PAGE_SIZE = 6;
+export const PAGE_SIZE = 5;
+export const BestSelling = 10;
 export const PRODUCT_ACTIVE = 1;
 export const PRODUCT_INACTIVE = 0;
 
 export const ALL = 0;
 export const INACTIVE = 1;
-export const ACTIVE = 2;
-export const WAIT = 3;
-export const PAID = 4;
-export const DELIVERING = 5;
-export const DELIVERED = 6;
-export const CANCEL = 7;
-export const COMMENTED = 8;
+export const ACTIVE = 'ACTIVE';
+export const WAIT = 'WAIT';
+export const PAID = 'PAID';
+export const DELIVERING = 'DELIVERING';
+export const DELIVERED = 'DELIVERED';
+export const CANCEL = 'CANCEL';
+export const COMMENTED = 'COMMENTED';
 
 export function convertState(state) {
     let result = '';

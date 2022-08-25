@@ -81,10 +81,20 @@ function Employees() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
+                                        <div
+                                            className="col-md-12 col-lg-12"
+                                            style={{ display: 'flex', justifyContent: 'center' }}
+                                        >
+                                            <h3>Quản lý nhân viên</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-header">
+                                    <div className="d-flex align-items-center">
                                         <div className="col-md-6 col-lg-4">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
-                                                    <label>Danh mục</label>
+                                                    <label>Bộ phận</label>
                                                     <select
                                                         className="form-control form-control"
                                                         onChange={handleChangeDepartment}
@@ -103,7 +113,7 @@ function Employees() {
                                         <div className="col-md-2 col-lg-2">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
-                                                    <label>Số sản phẩm</label>
+                                                    <label>Số item hiển thị</label>
                                                     <select
                                                         className="form-control"
                                                         onChange={(e) => setItemDisplay(e.target.value)}
@@ -127,7 +137,7 @@ function Employees() {
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
-                                                    placeholder="Nhập tên sản phẩm..."
+                                                    placeholder="Nhập tên..."
                                                 />
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
@@ -138,11 +148,11 @@ function Employees() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-employee'} style={{ color: 'white' }}>
-                                                    <i className="fa fa-plus " /> Add
-                                                </Link>
-                                            </button>
+                                            <Link to={'/update-employee'} style={{ color: 'white' }}>
+                                                <button className="btn btn-primary btn-round ml-auto">
+                                                    <i className="fa fa-plus " /> Thêm nhân viên
+                                                </button>
+                                            </Link>
                                         </div>
                                     </div>
                                     <div className="table-responsive">
@@ -165,7 +175,7 @@ function Employees() {
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                                         {totalPages > 1 ? (
                                             <Pagination
-                                                color="secondary"
+                                                color="primary"
                                                 count={totalPages}
                                                 size="large"
                                                 page={page}

@@ -2,7 +2,7 @@ import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import * as CategoryService from '../../services/CategoryService';
 import * as ProductService from '../../services/ProductService';
-import { admin_url } from '../../services/base_url';
+import { admin_url, public_url } from '../../services/base_url';
 import axios from 'axios';
 import Toast from '../../utils/Toast';
 import Redirect from '../../utils/Redirect';
@@ -11,6 +11,7 @@ import swal from 'sweetalert';
 function UpdateProduct() {
     let { productId } = useParams();
     const [categories, setCategories] = useState([]);
+
     const [data, setData] = useState({
         id: '',
         name: '',
@@ -66,12 +67,36 @@ function UpdateProduct() {
                 } else {
                     Toast('success', 'Thêm mới thành công!');
                 }
-                setTimeout(() => Redirect(''), 3000);
+                if (file) {
+                    uploadFile(response.data.id);
+                }
+                setTimeout(() => Redirect(''), 5000);
             })
             .catch((error) => {
                 Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
             });
     };
+
+    function uploadFile(id) {
+        const url = `${public_url}/products/image`;
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('file', file);
+        formData.append('fileName', file.name);
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+            },
+        };
+        axios
+            .post(url, formData, config)
+            .then((response) => {
+                // Toast('success', 'Successfully updated!!');
+            })
+            .catch((error) => {
+                Toast('error', 'Something went wrong : ' + error);
+            });
+    }
 
     const handleClickCancel = (e) => {
         e.preventDefault();
@@ -87,6 +112,31 @@ function UpdateProduct() {
         });
     };
 
+    const [file, setFile] = useState();
+    const [selectedFile, setSelectedFile] = useState();
+    const [preview, setPreview] = useState();
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreview(undefined);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [selectedFile]);
+
+    const onSelectFile = (e) => {
+        if (!e.target.files || e.target.files.length === 0) {
+            setSelectedFile(undefined);
+            return;
+        }
+        setSelectedFile(e.target.files[0]);
+        setFile(e.target.files[0]);
+    };
+
     return (
         <div className="main-panel">
             <ToastContainer />
@@ -97,36 +147,41 @@ function UpdateProduct() {
                             <form>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">Add new product</div>
+                                        <div
+                                            className="card-title"
+                                            style={{ display: 'flex', justifyContent: 'center' }}
+                                        >
+                                            {isUpdate ? 'Cập nhập sản phẩm' : 'Thêm mới sản phẩm'}
+                                        </div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="id">Product Id</label>
+                                                    <label htmlFor="id">Mã sản phẩm</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter id"
+                                                        placeholder="Nhập mã sản phẩm"
                                                         name="id"
                                                         value={data.id || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Name</label>
+                                                    <label htmlFor="name">Tên sản phẩm</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter name"
+                                                        placeholder="Nhập tên sản phẩm"
                                                         name="name"
                                                         value={data.name || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label>Category</label>
+                                                    <label>Danh mục sản phẩm</label>
                                                     <select
                                                         className="form-control form-control"
                                                         name="categoryId"
@@ -145,7 +200,7 @@ function UpdateProduct() {
                                                     </select>
                                                 </div>
                                                 <div className="form-check mb-1 mt-1">
-                                                    <label>Status</label>
+                                                    <label>Tình trạng</label>
                                                     <br />
                                                     <div style={{ textAlign: 'center' }}>
                                                         <div name="status" onChange={onChange}>
@@ -156,7 +211,7 @@ function UpdateProduct() {
                                                                     value="true"
                                                                     name="status"
                                                                     onChange={onChange}
-                                                                    checked={data.status === 'true'}
+                                                                    checked={data.status === true}
                                                                 />
                                                                 Active
                                                             </label>
@@ -167,7 +222,7 @@ function UpdateProduct() {
                                                                     value="false"
                                                                     name="status"
                                                                     onChange={onChange}
-                                                                    checked={data.status === 'false'}
+                                                                    checked={data.status === false}
                                                                 />
                                                                 Inactive
                                                             </label>
@@ -175,7 +230,7 @@ function UpdateProduct() {
                                                     </div>
                                                 </div>
                                                 <div className="form-check mb-1 mt-1">
-                                                    <label>Is New</label>
+                                                    <label>Sản phẩm mới ?</label>
                                                     <br />
                                                     <div style={{ textAlign: 'center' }}>
                                                         <div name="isNew" onChange={onChange}>
@@ -186,7 +241,7 @@ function UpdateProduct() {
                                                                     value="true"
                                                                     name="isNew"
                                                                     onChange={onChange}
-                                                                    checked={data.isNew === 'true'}
+                                                                    checked={data.isNew === true}
                                                                 />
                                                                 Yes
                                                             </label>
@@ -197,7 +252,7 @@ function UpdateProduct() {
                                                                     value="false"
                                                                     name="isNew"
                                                                     onChange={onChange}
-                                                                    checked={data.isNew === 'false'}
+                                                                    checked={data.isNew === false}
                                                                 />
                                                                 No
                                                             </label>
@@ -208,19 +263,34 @@ function UpdateProduct() {
                                                     <input
                                                         type="file"
                                                         className="form-control-file"
-                                                        // onChange={handleChange}
+                                                        onChange={onSelectFile}
                                                     />
                                                 </div>
                                                 <div className="form-group">
                                                     <div className="row">
                                                         <div className="col-4 col-sm-4"></div>
                                                         <div className="col-4 col-sm-4">
-                                                            {/* <img
-                                                        src={image || ''}
-                                                        alt="title"
-                                                        className=""
-                                                        style={{ textAlign: 'center', width: '200px', height: '200px' }}
-                                                    /> */}
+                                                            {selectedFile ? (
+                                                                <img
+                                                                    src={preview}
+                                                                    style={{
+                                                                        textAlign: 'center',
+                                                                        width: '200px',
+                                                                        height: '200px',
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <img
+                                                                    src={data.image || ''}
+                                                                    alt="title"
+                                                                    className=""
+                                                                    style={{
+                                                                        textAlign: 'center',
+                                                                        width: '200px',
+                                                                        height: '200px',
+                                                                    }}
+                                                                />
+                                                            )}
                                                         </div>
                                                         <div className="col-4 col-sm-4"></div>
                                                     </div>
@@ -228,30 +298,30 @@ function UpdateProduct() {
                                             </div>
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="price">Price</label>
+                                                    <label htmlFor="price">Giá</label>
                                                     <input
                                                         type="number"
                                                         className="form-control"
-                                                        placeholder="Enter price"
+                                                        placeholder="Nhập giá"
                                                         name="price"
                                                         onChange={onChange}
                                                         value={data.price || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="quantity">Quantity</label>
+                                                    <label htmlFor="quantity">Số lượng</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="number"
                                                         className="form-control"
-                                                        placeholder="Enter quantity"
+                                                        placeholder="Nhập số lượng"
                                                         name="inventoryNumber"
                                                         onChange={onChange}
                                                         value={data.inventoryNumber || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="description">Description</label>
+                                                    <label htmlFor="description">Mô tả sản phẩm</label>
                                                     <textarea
                                                         className="form-control"
                                                         id="description"
@@ -267,10 +337,10 @@ function UpdateProduct() {
 
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
-                                            {isUpdate ? 'Update' : 'Add'}
+                                            {isUpdate ? 'Cập nhập' : 'Thêm mới'}
                                         </button>
                                         <button type="cancel" className="btn btn-danger" onClick={handleClickCancel}>
-                                            Cancel
+                                            Hủy
                                         </button>
                                     </div>
                                 </div>

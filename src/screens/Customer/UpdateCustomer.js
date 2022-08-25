@@ -88,37 +88,37 @@ function UpdateCustomer() {
                             <form>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">Add new customer</div>
+                                        <div className="card-title">Thêm khách hàng mới</div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="id">Customer id</label>
+                                                    <label htmlFor="id">Chứng minh nhân dân</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter id"
+                                                        placeholder="Nhập chứng minh nhân dân"
                                                         name="cardId"
                                                         value={data.cardId || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Name</label>
+                                                    <label htmlFor="name">Tên khách hàng</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter name"
+                                                        placeholder="Nhập tên"
                                                         name="name"
                                                         value={data.name || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-check mb-1 mt-1">
-                                                    <label>Status</label>
+                                                    <label>Trạng thái</label>
                                                     <br />
                                                     <div style={{ textAlign: 'center' }}>
                                                         <div name="status" onChange={onChange}>
@@ -152,7 +152,7 @@ function UpdateCustomer() {
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter email"
+                                                        placeholder="Nhập email"
                                                         name="email"
                                                         onChange={onChange}
                                                         value={data.email || ''}
@@ -162,29 +162,29 @@ function UpdateCustomer() {
 
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="quantity">Phone Number</label>
+                                                    <label htmlFor="quantity">Số điện thoại</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter Phone Number"
+                                                        placeholder="Nhập số điện thoại"
                                                         name="phoneNumber"
                                                         onChange={onChange}
                                                         value={data.phoneNumber || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="taxCode">Tax Code</label>
+                                                    <label htmlFor="taxCode">Mã số thuế</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Enter tax code"
+                                                        placeholder="Nhập mã số thuế"
                                                         name="taxCode"
                                                         onChange={onChange}
                                                         value={data.taxCode || ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="address">Address</label>
+                                                    <label htmlFor="address">Địa chỉ</label>
                                                     <textarea
                                                         className="form-control"
                                                         rows={8}
@@ -198,10 +198,10 @@ function UpdateCustomer() {
                                     </div>
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
-                                            {isUpdate ? 'Update' : 'Add'}
+                                            {isUpdate ? 'Cập nhập' : 'Thêm'}
                                         </button>
                                         <button type="cancel" className="btn btn-danger" onClick={handleClickCancel}>
-                                            Cancel
+                                            Hủy
                                         </button>
                                     </div>
                                 </div>
