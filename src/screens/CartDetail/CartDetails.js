@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { PAGE_SIZE } from '../../services/constant';
 import * as CartDetailService from '../../services/CartDetailService';
 import * as EmployeeService from '../../services/EmployeeService';
+import * as CartService from '../../services/CartService';
 import axios from 'axios';
 import * as constant from '../../services/constant';
-import { admin_url, user_url } from '../../services/base_url';
+import { admin_url } from '../../services/base_url';
 import CurrencyFormat from 'react-currency-format';
+import Redirect from '../../utils/Redirect';
+import Toast from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
 function CartDetails() {
     let { id } = useParams();
 
@@ -14,8 +18,18 @@ function CartDetails() {
     const [cartDetails, setCartDetails] = useState([]);
     const [states, setStates] = useState();
     const [totals, setTotals] = useState();
-    const [searchState, setSearchState] = useState('shipping001');
     const [isUpdate, setIsUpdate] = useState(false);
+    const [searchState, setSearchState] = useState(
+        useEffect(() => {
+            const getOne = async () => {
+                const result = await CartService.getOne(id);
+                setCart(result.data);
+                return result.data.deliveryId;
+            };
+            getOne();
+        }, []),
+    );
+    const [cart, setCart] = useState();
 
     useEffect(() => {
         const getDetailCart = async () => {
@@ -27,6 +41,15 @@ function CartDetails() {
         };
         getDetailCart();
     }, [isUpdate]);
+
+    useEffect(() => {
+        const getOne = async () => {
+            const result = await CartService.getOne(id);
+            setCart(result.data);
+            return result.data;
+        };
+        getOne();
+    }, []);
 
     useEffect(() => {
         const getAllEmployeeByDepartment = async () => {
@@ -58,13 +81,23 @@ function CartDetails() {
         })
             .then(function (response) {
                 setIsUpdate(true);
+                Toast('success', 'Cập nhật thành công!');
+                setTimeout(() => Redirect('invoices'), 3000);
             })
             .catch(function (error) {
-                console.log(error);
                 setIsUpdate(false);
             });
         setIsUpdate(false);
     };
+
+    // console.log(searchState);
+    // useEffect(() => {
+    //     if (cart) {
+    //         setSearchState(cart.deliveryId);
+    //     } else {
+    //         setSearchState('shipping001');
+    //     }
+    // }, [id]);
 
     const handleChangeState = (e) => {
         setSearchState(e.target.value);
@@ -72,6 +105,7 @@ function CartDetails() {
 
     return (
         <div className="main-panel">
+            <ToastContainer />
             <div className="content">
                 <div className="page-inner">
                     <div className="row">
@@ -91,9 +125,9 @@ function CartDetails() {
                                                             <option
                                                                 key={item.id}
                                                                 value={item.id}
-                                                                // selected={item.id === 'confirm003'}
+                                                                selected={item.id === cart.deliveryId}
                                                             >
-                                                                {item.name}
+                                                                {item.id + ' - ' + item.name}
                                                             </option>
                                                         ))}
                                                     </select>

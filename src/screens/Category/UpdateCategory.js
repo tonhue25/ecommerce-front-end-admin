@@ -29,7 +29,6 @@ function UpdateCategory() {
             const getOne = async () => {
                 const result = await CategoryService.getOne(categoryId);
                 setData(result.data);
-                console.log(data);
                 return result.data;
             };
             getOne();
@@ -43,22 +42,31 @@ function UpdateCategory() {
     const handleUpdate = (e) => {
         e.preventDefault();
         const url = `${admin_url}/categories`;
-        axios
-            .post(url, data)
-            .then((response) => {
-                if (isUpdate) {
-                    Toast('success', 'Chỉnh sửa thành công!');
-                } else {
-                    Toast('success', 'Thêm mới thành công!');
-                }
-                if (file) {
-                    uploadFile(response.data.id);
-                }
-                setTimeout(() => Redirect('categories'), 3000);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
+        if (data.id === '') {
+            Toast('warning', 'Vui lòng nhập mã!');
+            return;
+        }
+        if (data.name === '') {
+            Toast('warning', 'Vui lòng nhập tên!');
+            return;
+        } else {
+            axios
+                .post(url, data)
+                .then((response) => {
+                    if (isUpdate) {
+                        Toast('success', 'Chỉnh sửa thành công!');
+                    } else {
+                        Toast('success', 'Thêm mới thành công!');
+                    }
+                    if (file) {
+                        uploadFile(response.data.id);
+                    }
+                    setTimeout(() => Redirect('categories'), 3000);
+                })
+                .catch((error) => {
+                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                });
+        }
     };
 
     const handleClickCancel = (e) => {

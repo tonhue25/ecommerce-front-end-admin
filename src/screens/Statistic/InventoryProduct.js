@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as ProductService from '../../services/ProductService';
-import { Link } from 'react-router-dom';
 import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
-import ProductItem from '../Product/ProductItem';
 import * as CategoryService from '../../services/CategoryService';
 import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
@@ -131,13 +129,6 @@ function InventoryProduct() {
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
-                                        {/* <div className="col-md-2 col-lg-2">
-                                            <button className="btn btn-primary btn-round ml-auto">
-                                                <Link to={'/update-product'} style={{ color: 'white' }}>
-                                                    <i className="fa fa-plus " /> Add
-                                                </Link>
-                                            </button>
-                                        </div> */}
                                     </div>
                                     <div className="table-responsive">
                                         <table className="display table table-striped table-hover">

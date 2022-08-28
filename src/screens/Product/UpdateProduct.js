@@ -59,22 +59,39 @@ function UpdateProduct() {
     const handleUpdate = (e) => {
         e.preventDefault();
         const url = `${admin_url}/products`;
-        axios
-            .post(url, data)
-            .then((response) => {
-                if (isUpdate) {
-                    Toast('success', 'Chỉnh sửa thành công!');
-                } else {
-                    Toast('success', 'Thêm mới thành công!');
-                }
-                if (file) {
-                    uploadFile(response.data.id);
-                }
-                setTimeout(() => Redirect(''), 5000);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
+        if (data.id === '') {
+            Toast('warning', 'Vui lòng nhập mã!');
+            return;
+        }
+        if (data.name === '') {
+            Toast('warning', 'Vui lòng nhập tên!');
+            return;
+        }
+        if (data.price === '') {
+            Toast('warning', 'Vui lòng nhập giá!');
+            return;
+        }
+        if (data.inventoryNumber === '') {
+            Toast('warning', 'Vui lòng nhập số lượng tồn!');
+            return;
+        } else {
+            axios
+                .post(url, data)
+                .then((response) => {
+                    if (isUpdate) {
+                        Toast('success', 'Chỉnh sửa thành công!');
+                    } else {
+                        Toast('success', 'Thêm mới thành công!');
+                    }
+                    if (file) {
+                        uploadFile(response.data.id);
+                    }
+                    setTimeout(() => Redirect(''), 5000);
+                })
+                .catch((error) => {
+                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                });
+        }
     };
 
     function uploadFile(id) {
@@ -211,7 +228,7 @@ function UpdateProduct() {
                                                                     value="true"
                                                                     name="status"
                                                                     onChange={onChange}
-                                                                    checked={data.status === true}
+                                                                    checked={data.status === 'true'}
                                                                 />
                                                                 Active
                                                             </label>
@@ -222,7 +239,7 @@ function UpdateProduct() {
                                                                     value="false"
                                                                     name="status"
                                                                     onChange={onChange}
-                                                                    checked={data.status === false}
+                                                                    checked={data.status === 'false'}
                                                                 />
                                                                 Inactive
                                                             </label>
@@ -241,7 +258,7 @@ function UpdateProduct() {
                                                                     value="true"
                                                                     name="isNew"
                                                                     onChange={onChange}
-                                                                    checked={data.isNew === true}
+                                                                    checked={data.isNew === 'true'}
                                                                 />
                                                                 Yes
                                                             </label>
@@ -252,7 +269,7 @@ function UpdateProduct() {
                                                                     value="false"
                                                                     name="isNew"
                                                                     onChange={onChange}
-                                                                    checked={data.isNew === false}
+                                                                    checked={data.isNew === 'false'}
                                                                 />
                                                                 No
                                                             </label>

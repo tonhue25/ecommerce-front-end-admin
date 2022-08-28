@@ -23,19 +23,9 @@ function InventoryItem({ data, deleteProduct }) {
                 </p>
             </td>
             <td>{data.name}</td>
-            {/* <td>
-                {point > 0 ? (
-                    <Rating precision={0.25} name="size-large" value={point || 0} size="small" readOnly />
-                ) : (
-                    <span></span>
-                )}
-            </td> */}
             <td>
                 <CurrencyFormat value={data.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
-            {/* <td>
-                <CurrencyFormat value={data.price} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
-            </td> */}
             <td>
                 <div className="form-button-action">
                     <button

@@ -20,3 +20,8 @@ export const changeState = async (cartId, statusChange) => {
     });
     return res;
 };
+
+export const getOne = async (id) => {
+    const res = await request_admin.get(`/carts/${id}`);
+    return res;
+};

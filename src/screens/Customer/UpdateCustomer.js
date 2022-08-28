@@ -48,20 +48,42 @@ function UpdateCustomer() {
     const handleUpdate = (e) => {
         e.preventDefault();
         data.roleId = 'customer';
+        console.log(data);
         const url = `${public_url}/customers`;
-        axios
-            .post(url, data)
-            .then((response) => {
-                if (isUpdate) {
-                    Toast('success', 'Chỉnh sửa thành công!');
-                } else {
-                    Toast('success', 'Thêm mới thành công!');
-                }
-                setTimeout(() => Redirect('customers'), 3000);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
+        if (data.cardId === '') {
+            Toast('warning', 'Vui lòng nhập chứng minh nhân dân!');
+            return;
+        }
+        if (data.email === '') {
+            Toast('warning', 'Vui lòng nhập email!');
+            return;
+        }
+        if (data.name === '') {
+            Toast('warning', 'Vui lòng nhập tên!');
+            return;
+        }
+        if (data.address === '') {
+            Toast('warning', 'Vui lòng nhập địa chỉ!');
+            return;
+        }
+        if (data.phoneNumber === '') {
+            Toast('warning', 'Vui lòng nhập số điện thoại!');
+            return;
+        } else {
+            axios
+                .post(url, data)
+                .then((response) => {
+                    if (isUpdate) {
+                        Toast('success', 'Chỉnh sửa thành công!');
+                    } else {
+                        Toast('success', 'Thêm mới thành công!');
+                    }
+                    setTimeout(() => Redirect('customers'), 3000);
+                })
+                .catch((error) => {
+                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                });
+        }
     };
 
     const handleClickCancel = (e) => {

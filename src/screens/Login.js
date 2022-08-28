@@ -1,8 +1,7 @@
 import Toast from '../utils/Toast';
 import { ToastContainer } from 'react-toastify';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
 import Redirect from '../utils/Redirect';
 import { admin_url } from '../services/base_url';
 
@@ -24,6 +23,10 @@ function Login({ setAccessToken }) {
             Toast('success', 'Đăng nhập thành công!');
             setTimeout(() => Redirect(''), 3000);
         } catch (err) {
+            if (err.response.data.message == 'account.not.active') {
+                Toast('error', 'Tài khoản không hoạt động, vui lòng kích hoạt lại!');
+                return;
+            }
             Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
         }
     };

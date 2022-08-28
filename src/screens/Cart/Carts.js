@@ -4,7 +4,9 @@ import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
 import * as StateService from '../../services/StateService';
 import * as CartService from '../../services/CartService';
 import { Pagination } from '@mui/material';
+import Moment from 'moment';
 function Carts() {
+    // const formatDate = Moment(data.birthday).format('DD/MM/YYYY');
     const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
     const [searchValue, setSearchValue] = useState('');
@@ -96,7 +98,7 @@ function Carts() {
                                 <div className="card-body">
                                     <div className="row">
                                         <div className="col-md-6 col-lg-4">
-                                            <div className="input-icon">
+                                            {/* <div className="input-icon">
                                                 <input
                                                     value={searchValue}
                                                     onChange={(e) => setSearchValue(e.target.value)}
@@ -107,7 +109,7 @@ function Carts() {
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
                                                 </span>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
@@ -133,8 +135,14 @@ function Carts() {
                                                     <tr key={item.id}>
                                                         <td style={{ width: '10px' }}>{item.id}</td>
                                                         <td>{item.customerName}</td>
-                                                        <td>{item.createDate}</td>
-                                                        <td>{item.dateDelivery}</td>
+                                                        {/* <td>{item.createDate}</td> */}
+                                                        <td>{Moment(item.createDate).format('DD/MM/YYYY')}</td>
+                                                        {/* <td>{item.dateDelivery}</td> */}
+                                                        <td>
+                                                            {item.dateDelivery
+                                                                ? Moment(item.dateDelivery).format('DD/MM/YYYY')
+                                                                : ''}
+                                                        </td>
                                                         <td>{item.confirmName}</td>
                                                         <td>{item.deliveryName}</td>
                                                         <td>{item.addressDelivery}</td>

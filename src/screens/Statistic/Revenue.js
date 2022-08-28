@@ -1,26 +1,35 @@
 import { useEffect, useState } from 'react';
 import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
 import * as RevenueService from '../../services/RevenueService';
-import { Pagination } from '@mui/material';
+import { Link, Pagination } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import CurrencyFormat from 'react-currency-format';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+
 function Revenue() {
     const [page, setPage] = useState(PAGE_ONE);
     const [revenues, setRevenues] = useState([]);
     const [totalPages, setTotalPages] = useState();
 
     const [data, setData] = useState({
-        startDate: '2022-6',
-        endDate: '2022-8',
+        startDate: '2022-06',
+        endDate: '2022-08',
     });
-
-    // function handleChange(page) {
-    //     setPage(page);
-    // }
 
     const onChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
+
+    useEffect(() => {
+        const getRevenue = async () => {
+            const result = await RevenueService.getRevenue(page, PAGE_SIZE, data.startDate, data.endDate);
+            setRevenues(result.data.list);
+            setTotalPages(result.data.totalPages);
+            return result.data;
+        };
+        getRevenue();
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -31,6 +40,17 @@ function Revenue() {
             return result.data;
         };
         getRevenue();
+    };
+
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+
+    const exportToCSV = (csvData, fileName) => {
+        const ws = XLSX.utils.json_to_sheet(csvData);
+        const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
     };
 
     return (
@@ -68,13 +88,18 @@ function Revenue() {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="col-md-2 col-lg-2">
+                                            <div className="col-md-2 col-lg-1">
+                                                <button type="submit" className="btn btn-success mr-5">
+                                                    Xem
+                                                </button>
+                                            </div>
+                                            <div className="col-md-2 col-lg-1">
                                                 <button
                                                     type="submit"
                                                     className="btn btn-success mr-5"
-                                                    // onClick={handleUpdate}
+                                                    onClick={(e) => exportToCSV(revenues, 'revenues')}
                                                 >
-                                                    Xem
+                                                    Export excel
                                                 </button>
                                             </div>
                                         </div>
@@ -115,21 +140,7 @@ function Revenue() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {/* {totalPages > 1 ? (
-                                            <Pagination
-                                                color="primary"
-                                                count={totalPages}
-                                                size="large"
-                                                page={page}
-                                                showFirstButton
-                                                showLastButton
-                                                onChange={(e, page) => handleChange(page)}
-                                            />
-                                        ) : (
-                                            <></>
-                                        )} */}
-                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}></div>
                                 </div>
                             </div>
                         </div>

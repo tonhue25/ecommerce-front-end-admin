@@ -57,20 +57,46 @@ function UpdateEmployee() {
     const handleUpdate = (e) => {
         e.preventDefault();
         data.roleId = 'employee';
-        const url = `${admin_url}/employees`;
-        axios
-            .post(url, data)
-            .then((response) => {
-                if (isUpdate) {
-                    Toast('success', 'Chỉnh sửa thành công!');
-                } else {
-                    Toast('success', 'Thêm mới thành công!');
-                }
-                setTimeout(() => Redirect('employees'), 3000);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
+
+        if (data.id === '') {
+            Toast('warning', 'Vui lòng nhập mã!');
+            return;
+        }
+        if (data.email === '') {
+            Toast('warning', 'Vui lòng nhập email!');
+            return;
+        }
+        if (data.name === '') {
+            Toast('warning', 'Vui lòng nhập tên!');
+            return;
+        }
+        if (data.birthday === '') {
+            Toast('warning', 'Vui lòng nhập ngày sinh!');
+            return;
+        }
+        if (data.address === '') {
+            Toast('warning', 'Vui lòng nhập địa chỉ!');
+            return;
+        }
+        if (data.salary === '') {
+            Toast('warning', 'Vui lòng nhập lương!');
+            return;
+        } else {
+            const url = `${admin_url}/employees`;
+            axios
+                .post(url, data)
+                .then((response) => {
+                    if (isUpdate) {
+                        Toast('success', 'Chỉnh sửa thành công!');
+                    } else {
+                        Toast('success', 'Thêm mới thành công!');
+                    }
+                    setTimeout(() => Redirect('employees'), 3000);
+                })
+                .catch((error) => {
+                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                });
+        }
     };
 
     const handleClickCancel = (e) => {
@@ -97,7 +123,9 @@ function UpdateEmployee() {
                             <form>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">Thêm nhân viên mới</div>
+                                        <div className="card-title">
+                                            {isUpdate ? 'Cập nhập thông tin nhân viên' : 'Thêm nhân viên mới'}
+                                        </div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
@@ -224,10 +252,10 @@ function UpdateEmployee() {
 
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
-                                            {isUpdate ? 'Update' : 'Add'}
+                                            {isUpdate ? 'Cập nhật' : 'Thêm'}
                                         </button>
                                         <button type="cancel" className="btn btn-danger" onClick={handleClickCancel}>
-                                            Cancel
+                                            Hủy
                                         </button>
                                     </div>
                                 </div>

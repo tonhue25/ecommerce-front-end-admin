@@ -20,6 +20,7 @@ import UpdateProduct from './screens/Product/UpdateProduct';
 import InventoryProduct from './screens/Statistic/InventoryProduct';
 import Revenue from './screens/Statistic/Revenue';
 import TopProduct from './screens/Statistic/TopProduct';
+import ExportPDF from './utils/ExportPDF';
 function App() {
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
     const [isReload, setIsReload] = useState(false);
@@ -63,6 +64,8 @@ function App() {
                     <Route path={'top-products'} element={<TopProduct />}></Route>
                     <Route path={'revenue-statistics'} element={<Revenue />}></Route>
                     <Route path={'inventory-product'} element={<InventoryProduct />}></Route>
+
+                    <Route path={'export-revenue'} element={<ExportPDF />}></Route>
                 </Route>
             </Routes>
         </div>

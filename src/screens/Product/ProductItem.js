@@ -36,7 +36,17 @@ function ProductItem({ data, deleteProduct }) {
             <td>
                 <CurrencyFormat value={data.price} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
             </td>
-            <td>{data.status === true ? 'Còn hàng' : 'Hết hàng'}</td>
+            {/* <td>{data.status === 'true' ? 'active' : 'Hết hàng'}</td> */}
+            <td>
+                <button
+                    type="button"
+                    className={
+                        data.status === 'true' ? 'btn-primary btn btn-link btn-lg' : 'btn-danger btn btn-link btn-lg'
+                    }
+                >
+                    {data.status === 'true' ? <i class="fa fa-check"></i> : <i className="fa fa-times" />}
+                </button>
+            </td>
             <td>
                 <button
                     type="button"

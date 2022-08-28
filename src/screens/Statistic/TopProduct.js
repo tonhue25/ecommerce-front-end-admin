@@ -4,6 +4,8 @@ import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
 import { Pagination } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import TopProductItem from './TopProductItem';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 function TopProduct() {
     const [page, setPage] = useState(PAGE_ONE);
     const [products, setProducts] = useState([]);
@@ -27,6 +29,16 @@ function TopProduct() {
         setPage(page);
     }
 
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const exportToCSV = (csvData, fileName) => {
+        const ws = XLSX.utils.json_to_sheet(csvData);
+        const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
+    };
+
     return (
         <div className="main-panel">
             <ToastContainer />
@@ -41,7 +53,17 @@ function TopProduct() {
                                             <h3>Top sản phẩm bán chạy</h3>
                                         </div>
                                         <div className="col-md-4 col-lg-6"></div>
-                                        <div className="col-md-2 col-lg-2"></div>
+                                        <div className="col-md-2 col-lg-2">
+                                            {/* <div className="col-md-2 col-lg-1"> */}
+                                            {/* <button
+                                                type="submit"
+                                                className="btn btn-success mr-5"
+                                                onClick={(e) => exportToCSV(products, 'bestsellingproducts')}
+                                            >
+                                                Export excel
+                                            </button> */}
+                                            {/* </div> */}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="card-body">
