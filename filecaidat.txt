@@ -1,0 +1,3 @@
+pull code về từ nhánh my_awesome_new_remote_repo: https://github.com/tonhue25/ecommerce-front-end-admin/tree/my_awesome_new_remote_repo
+mở source code bằng công cụ: visual studio code.
+mở terminal, gõ câu lệnh npm start - để chạy chương trình.
