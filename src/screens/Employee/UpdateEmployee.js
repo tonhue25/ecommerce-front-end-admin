@@ -57,6 +57,7 @@ function UpdateEmployee() {
     const handleUpdate = (e) => {
         e.preventDefault();
         data.roleId = 'employee';
+        // data.password = '';
 
         if (data.id === '') {
             Toast('warning', 'Vui lòng nhập mã!');

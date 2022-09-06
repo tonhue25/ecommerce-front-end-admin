@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Rating } from '@mui/material';
 import * as ProductService from '../../services/ProductService';
+import * as DiscountDetailService from '../../services/DiscountDetailService';
 import { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 function ProductItem({ data, deleteProduct }) {
@@ -12,6 +13,17 @@ function ProductItem({ data, deleteProduct }) {
             return result.data;
         };
         fetchApiGetPoint();
+    }, []);
+
+    // lấy thông tin giảm giá.
+    const [discount, setDiscount] = useState();
+    useEffect(() => {
+        const getOne = async () => {
+            const result = await DiscountDetailService.getOne(data.id);
+            setDiscount(result.data);
+            return result.data;
+        };
+        getOne();
     }, []);
 
     return (
@@ -33,6 +45,7 @@ function ProductItem({ data, deleteProduct }) {
             <td>
                 <CurrencyFormat value={data.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
+            <td>{discount > 0 ? discount + ' %' : ''} </td>
             <td>
                 <CurrencyFormat value={data.price} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
             </td>

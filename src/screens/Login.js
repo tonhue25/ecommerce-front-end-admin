@@ -6,12 +6,19 @@ import Redirect from '../utils/Redirect';
 import { admin_url } from '../services/base_url';
 
 function Login({ setAccessToken }) {
-    // const navigate = useNavigate();
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (id == '') {
+            Toast('warning', 'Vui lòng nhập tài khoản đăng nhập!');
+            return;
+        }
+        if (password == '') {
+            Toast('warning', 'Vui lòng nhập mật khẩu!');
+            return;
+        }
         const url = `${admin_url}/login`;
         try {
             const response = await axios.post(url, {
@@ -20,14 +27,16 @@ function Login({ setAccessToken }) {
             });
             localStorage.setItem('accessToken', JSON.stringify(response.data));
             setAccessToken(localStorage.getItem('accessToken'));
-            Toast('success', 'Đăng nhập thành công!');
-            setTimeout(() => Redirect(''), 3000);
+            if (response.data.departmentId == 'shipping') {
+                Redirect('my-invoices');
+            }
         } catch (err) {
             if (err.response.data.message == 'account.not.active') {
                 Toast('error', 'Tài khoản không hoạt động, vui lòng kích hoạt lại!');
                 return;
             }
-            Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+            Toast('error', 'Tên đăng nhập hoặc mật khẩu không chính xác!');
+            return;
         }
     };
 

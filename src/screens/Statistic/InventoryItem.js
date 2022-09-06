@@ -16,17 +16,17 @@ function InventoryItem({ data, deleteProduct }) {
 
     return (
         <tr>
-            <td>{data.id}</td>
-            <td style={{ width: '10%', justifyContent: 'center' }}>
+            <td style={{ width: '20%' }}>{data.id}</td>
+            <td style={{ width: '20%', justifyContent: 'center' }}>
                 <p className="avatar-lg ">
                     <img src={data.image} className="avatar-img rounded-circle" />
                 </p>
             </td>
-            <td>{data.name}</td>
-            <td>
+            <td style={{ width: '40%' }}>{data.name}</td>
+            <td style={{ width: '20%', justifyContent: 'center' }}>
                 <CurrencyFormat value={data.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
-            <td>
+            {/* <td>
                 <div className="form-button-action">
                     <button
                         type="button"
@@ -40,7 +40,7 @@ function InventoryItem({ data, deleteProduct }) {
                         </Link>
                     </button>
                 </div>
-            </td>
+            </td> */}
         </tr>
     );
 }

@@ -164,7 +164,8 @@ function Products() {
                                                     <th>Tên sản phẩm</th>
                                                     <th></th>
                                                     <th>Số lượng tồn</th>
-                                                    <th>Giá</th>
+                                                    <th>Giảm</th>
+                                                    <th>Giá gốc</th>
                                                     <th>Trạng thái</th>
                                                     <th>Bình luận</th>
                                                     <th></th>

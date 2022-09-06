@@ -20,6 +20,7 @@ function UpdateCustomer() {
         accountId: '',
         roleId: 'customer',
         status: 'true',
+        password: '',
     });
 
     useEffect(() => {
@@ -48,6 +49,7 @@ function UpdateCustomer() {
     const handleUpdate = (e) => {
         e.preventDefault();
         data.roleId = 'customer';
+        data.password = '';
         console.log(data);
         const url = `${public_url}/customers`;
         if (data.cardId === '') {
@@ -110,7 +112,9 @@ function UpdateCustomer() {
                             <form>
                                 <div className="card">
                                     <div className="card-header">
-                                        <div className="card-title">Thêm khách hàng mới</div>
+                                        <div className="card-title">
+                                            {isUpdate ? 'Cập nhật thông tin' : 'Thêm khách hàng mới'}
+                                        </div>
                                     </div>
                                     <div className="card-body">
                                         <div className="row">

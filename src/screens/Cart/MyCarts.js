@@ -5,15 +5,13 @@ import * as StateService from '../../services/StateService';
 import * as CartService from '../../services/CartService';
 import { Pagination } from '@mui/material';
 import Moment from 'moment';
-function Carts() {
+function MyCarts() {
     const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
     const [searchState, setSearchState] = useState('');
-    const [searchCustomer, setSearchCustomer] = useState('');
     const [carts, setCarts] = useState([]);
     const [states, setStates] = useState({});
-
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
     useEffect(() => {
         const getAllStates = async () => {
             const result = await StateService.getAllStates();
@@ -29,13 +27,16 @@ function Carts() {
     };
 
     useEffect(() => {
-        const getAllCarts = async () => {
-            const result = await CartService.getAllCarts(page, PAGE_SIZE, searchState, searchCustomer);
-            setCarts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data.list;
-        };
-        getAllCarts();
+        if (accessToken) {
+            let employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
+            const getAllCarts = async () => {
+                const result = await CartService.getListCartByEmployeeId(page, PAGE_SIZE, searchState, employeeId);
+                setCarts(result.data.list);
+                setTotalPages(result.data.totalPages);
+                return result.data.list;
+            };
+            getAllCarts();
+        }
     }, [searchState, page]);
 
     const showState = () => {
@@ -80,7 +81,7 @@ function Carts() {
                                         <div className="col-md-6 col-lg-4">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
-                                                    <label>Danh mục</label>
+                                                    <label>Trạng thái</label>
                                                     <select
                                                         className="form-control form-control"
                                                         onChange={handleChangeState}
@@ -97,20 +98,7 @@ function Carts() {
                                 </div>
                                 <div className="card-body">
                                     <div className="row">
-                                        <div className="col-md-6 col-lg-4">
-                                            {/* <div className="input-icon">
-                                                <input
-                                                    value={searchValue}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Nhập tên khách hàng..."
-                                                />
-                                                <span className="input-icon-addon">
-                                                    <i className="fa fa-search" />
-                                                </span>
-                                            </div> */}
-                                        </div>
+                                        <div className="col-md-6 col-lg-4"></div>
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
@@ -135,9 +123,7 @@ function Carts() {
                                                     <tr key={item.id}>
                                                         <td style={{ width: '10px' }}>{item.id}</td>
                                                         <td>{item.customerName}</td>
-                                                        {/* <td>{item.createDate}</td> */}
                                                         <td>{Moment(item.createDate).format('DD/MM/YYYY')}</td>
-                                                        {/* <td>{item.dateDelivery}</td> */}
                                                         <td>
                                                             {item.dateDelivery
                                                                 ? Moment(item.dateDelivery).format('DD/MM/YYYY')
@@ -171,7 +157,7 @@ function Carts() {
                                                                 className="btn btn-link btn-primary btn-lg"
                                                                 data-original-title="Edit Task"
                                                             >
-                                                                <Link to={`/detail-invoices/${item.id}`}>
+                                                                <Link to={`/detail-shipping/${item.id}`}>
                                                                     <i className="fa fa-eye"></i>
                                                                 </Link>
                                                             </button>
@@ -206,4 +192,4 @@ function Carts() {
     );
 }
 
-export default Carts;
+export default MyCarts;

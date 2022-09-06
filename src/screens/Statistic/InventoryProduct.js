@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as ProductService from '../../services/ProductService';
 import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
 import * as CategoryService from '../../services/CategoryService';
@@ -6,6 +6,9 @@ import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
 import InventoryItem from './InventoryItem';
+
+import { PDFExport } from '@progress/kendo-react-pdf';
+import 'react-datepicker/dist/react-datepicker.css';
 function InventoryProduct() {
     const [page, setPage] = useState(PAGE_ONE);
     const [categories, setCategories] = useState([]);
@@ -14,7 +17,6 @@ function InventoryProduct() {
     const [searchValue, setSearchValue] = useState('');
     const [searchCategory, setSearchCategory] = useState('');
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
-    const [isDelete, setIsDelete] = useState(false);
 
     useEffect(() => {
         const getListProduct = async () => {
@@ -24,12 +26,10 @@ function InventoryProduct() {
             return result.data;
         };
         getListProduct();
-    }, [page, itemDisplay, searchValue, searchCategory, isDelete]);
+    }, [page, itemDisplay, searchValue, searchCategory]);
 
     function ShowProducts(products) {
-        return products.map((item) => (
-            <InventoryItem key={item.id} data={item} deleteProduct={() => deleteProduct(item.id, item.status)} />
-        ));
+        return products.map((item) => <InventoryItem key={item.id} data={item} />);
     }
 
     useEffect(() => {
@@ -41,20 +41,6 @@ function InventoryProduct() {
         getAllCategories();
     }, []);
 
-    const deleteProduct = (id, status) => {
-        if (status == 'true') {
-            const deleteItem = async () => {
-                const result = await ProductService.deleteItem(id);
-                setIsDelete(true);
-                Toast('success', 'Đã xóa sản phẩm!!');
-            };
-            deleteItem();
-            setIsDelete(false);
-        } else {
-            Toast('warning', 'Sản phẩm đã xóa!!');
-        }
-    };
-
     const handleChangeCategory = (e) => {
         setSearchCategory(e.target.value);
     };
@@ -62,6 +48,13 @@ function InventoryProduct() {
     function handleChange(page) {
         setPage(page);
     }
+
+    const pdfExportComponent = useRef(null);
+    const exportPDFWithComponent = () => {
+        if (pdfExportComponent.current) {
+            pdfExportComponent.current.save();
+        }
+    };
 
     return (
         <div className="main-panel">
@@ -91,7 +84,15 @@ function InventoryProduct() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-4 col-lg-6"></div>
+                                        <div className="col-md-4 col-lg-6">
+                                            <button
+                                                type="submit"
+                                                className="btn btn-success ml-5"
+                                                onClick={exportPDFWithComponent}
+                                            >
+                                                Export pdf
+                                            </button>
+                                        </div>
                                         <div className="col-md-2 col-lg-2">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
@@ -130,21 +131,28 @@ function InventoryProduct() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                     </div>
-                                    <div className="table-responsive">
-                                        <table className="display table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Mã</th>
-                                                    <th>Ảnh</th>
-                                                    <th>Tên sản phẩm</th>
-                                                    <th>Số lượng tồn</th>
-                                                    <th></th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>{ShowProducts(products)}</tbody>
-                                        </table>
-                                    </div>
+                                    <PDFExport ref={pdfExportComponent} paperSize="A3">
+                                        <div className="row mt-5">
+                                            <div className="col-md-12 col-lg-12">
+                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                    <h2>Inventory products</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="table-responsive">
+                                            <table className="display table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ width: '20%' }}>Id</th>
+                                                        <th style={{ width: '20%' }}>Image</th>
+                                                        <th style={{ width: '40%' }}>Name</th>
+                                                        <th style={{ width: '20%' }}>Inventory quantity</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>{ShowProducts(products)}</tbody>
+                                            </table>
+                                        </div>
+                                    </PDFExport>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                                         {totalPages > 1 ? (
                                             <Pagination

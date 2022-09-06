@@ -4,6 +4,15 @@ import * as EmployeeService from '../services/EmployeeService';
 function Sidebar() {
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
     const [data, setData] = useState({});
+
+    const [isDisplay, setIsDisplay] = useState(true);
+
+    useEffect(() => {
+        if (data && data.departmentId == 'shipping') {
+            setIsDisplay(false);
+        }
+    }, [data]);
+
     useEffect(() => {
         if (accessToken) {
             let employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
@@ -36,58 +45,71 @@ function Sidebar() {
                             <div className="clearfix" />
                         </div>
                     </div>
+
                     <ul className="nav nav-primary">
-                        <li className="nav-item">
-                            <Link to={'/'}>
-                                <p>Sản phẩm</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to={'/categories'}>
-                                <p>Danh mục</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to={'/employees'}>
-                                <p>Nhân viên</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to={'/customers'}>
-                                <p>Khách hàng</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to={'/invoices'}>
-                                <p>Đơn hàng</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <a data-toggle="collapse" href="#tables">
-                                <i className="fas fa-table" />
-                                <p>Thống kê</p>
-                                <span className="caret" />
-                            </a>
-                            <div className="collapse" id="tables">
-                                <ul className="nav nav-collapse">
-                                    <li>
-                                        <Link to={'/top-products'}>
-                                            <p>Sản phẩm bán chạy</p>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to={'/revenue-statistics'}>
-                                            <p>Thống kế doanh thu</p>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link to={'/inventory-product'}>
-                                            <p>Sản phẩm tồn kho</p>
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                        {isDisplay ? (
+                            <>
+                                <li className="nav-item">
+                                    <Link to={'/'}>
+                                        <p>Sản phẩm</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to={'/categories'}>
+                                        <p>Danh mục</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to={'/employees'}>
+                                        <p>Nhân viên</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to={'/customers'}>
+                                        <p>Khách hàng</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to={'/invoices'}>
+                                        <p>Đơn hàng</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <a data-toggle="collapse" href="#tables">
+                                        <i className="fas fa-table" />
+                                        <p>Thống kê</p>
+                                        <span className="caret" />
+                                    </a>
+                                    <div className="collapse" id="tables">
+                                        <ul className="nav nav-collapse">
+                                            <li>
+                                                <Link to={'/top-products'}>
+                                                    <p>Sản phẩm bán chạy</p>
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link to={'/revenue-statistics'}>
+                                                    <p>Thống kế doanh thu</p>
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link to={'/inventory-product'}>
+                                                    <p>Sản phẩm tồn kho</p>
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li className="nav-item">
+                                    <Link to={'/my-invoices'}>
+                                        <p>Đơn hàng</p>
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                         <li className="mx-4 mt-2">
                             <a href="/">
                                 <button

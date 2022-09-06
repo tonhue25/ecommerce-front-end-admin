@@ -33,11 +33,13 @@ export const getProductByCategory = async (categoryId) => {
     return res;
 };
 
-export const getBestSellingProduct = async (page, size) => {
-    const res = await request_public.get('/products/top-best-selling-product', {
+export const getBestSellingProduct = async (page, size, startDate, endDate) => {
+    const res = await request_admin.get('/products/best-selling-product', {
         params: {
             page,
             size,
+            startDate,
+            endDate,
         },
     });
     return res;

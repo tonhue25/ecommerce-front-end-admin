@@ -28,42 +28,29 @@ function TopProductItem({ data }) {
 
     return (
         <tr>
-            <td>{values.id}</td>
+            <td style={{ width: '10%' }}>{values.id}</td>
             <td style={{ width: '10%', justifyContent: 'center' }}>
                 <p className="avatar-lg ">
                     <img src={values.image} className="avatar-img rounded-circle" />
                 </p>
             </td>
-            <td>{values.name}</td>
-            <td>
+            <td style={{ width: '20%' }}>{values.name}</td>
+            <td style={{ width: '10%' }}>
                 {point > 0 ? (
                     <Rating precision={0.25} name="size-large" value={point || 0} size="small" readOnly />
                 ) : (
                     <span></span>
                 )}
             </td>
-            <td>
+            <td style={{ width: '15%' }}>
                 <CurrencyFormat value={values.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
 
-            <td>
+            <td style={{ width: '15%' }}>
                 <CurrencyFormat value={data.quantity} displayType={'text'} thousandSeparator={true} />
             </td>
-            <td>
+            <td style={{ width: '20%' }}>
                 <CurrencyFormat value={data.total} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
-            </td>
-            <td>
-                <button
-                    type="button"
-                    data-toggle="tooltip"
-                    title="Edit"
-                    className="btn btn-link btn-primary btn-lg"
-                    data-original-title="Edit Task"
-                >
-                    <Link to={`/comments/${data.productId}`}>
-                        <i className="fa fa-eye"></i>
-                    </Link>
-                </button>
             </td>
         </tr>
     );

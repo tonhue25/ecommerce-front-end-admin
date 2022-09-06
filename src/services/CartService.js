@@ -25,3 +25,14 @@ export const getOne = async (id) => {
     const res = await request_admin.get(`/carts/${id}`);
     return res;
 };
+
+export const getListCartByEmployeeId = async (page, size, state, employeeId) => {
+    const res = await request_admin.get(`/carts/shippingby/${employeeId}`, {
+        params: {
+            page,
+            size,
+            state,
+        },
+    });
+    return res;
+};

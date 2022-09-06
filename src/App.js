@@ -3,7 +3,9 @@ import { Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Layout from './Layout/Layout';
 import Carts from './screens/Cart/Carts';
+import MyCarts from './screens/Cart/MyCarts';
 import CartDetails from './screens/CartDetail/CartDetails';
+import CartDetailsShipping from './screens/CartDetail/CartDetailsShipping';
 import Categories from './screens/Category/Categories';
 import UpdateCategory from './screens/Category/UpdateCategory';
 import Comments from './screens/Comment/Comments';
@@ -56,6 +58,7 @@ function App() {
 
                     <Route path={'invoices'} element={<Carts />}></Route>
                     <Route path={'detail-invoices/:id'} element={<CartDetails />}></Route>
+                    <Route path={'detail-shipping/:id'} element={<CartDetailsShipping />}></Route>
 
                     <Route path={'imports'} element={<Imports />}></Route>
                     <Route path={'update-import'} element={<UpdateImport />}></Route>
@@ -66,6 +69,8 @@ function App() {
                     <Route path={'inventory-product'} element={<InventoryProduct />}></Route>
 
                     <Route path={'export-revenue'} element={<ExportPDF />}></Route>
+
+                    <Route path={'my-invoices'} element={<MyCarts />}></Route>
                 </Route>
             </Routes>
         </div>

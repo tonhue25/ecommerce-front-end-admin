@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
 import * as CartDetailService from '../../services/CartDetailService';
 import * as EmployeeService from '../../services/EmployeeService';
 import * as CartService from '../../services/CartService';
@@ -11,14 +10,15 @@ import CurrencyFormat from 'react-currency-format';
 import Redirect from '../../utils/Redirect';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
-function CartDetails() {
+import Moment from 'moment';
+function CartDetailsShipping() {
     let { id } = useParams();
-
     const [employees, setEmployees] = useState([]);
     const [cartDetails, setCartDetails] = useState([]);
     const [states, setStates] = useState();
     const [totals, setTotals] = useState();
     const [isUpdate, setIsUpdate] = useState(false);
+
     const [searchState, setSearchState] = useState(
         useEffect(() => {
             const getOne = async () => {
@@ -46,6 +46,7 @@ function CartDetails() {
         const getOne = async () => {
             const result = await CartService.getOne(id);
             setCart(result.data);
+            console.log(result.data);
             return result.data;
         };
         getOne();
@@ -62,37 +63,25 @@ function CartDetails() {
 
     const handleConfirm = (cartId, status) => {
         let statusChange;
-        if (status === constant.WAIT) {
-            statusChange = constant.DELIVERING;
+        if (status === constant.DELIVERING) {
+            statusChange = constant.DELIVERED;
         }
-        // if (
-        //     status === constant.DELIVERING &&
-        //     JSON.parse(localStorage.getItem('accessToken')).departmentId == 'shipping'
-        // ) {
-        //     // else if (status === constant.DELIVERING)
-        //     statusChange = constant.DELIVERED;
-        // }
         setIsUpdate(true);
-        let employeeConfirm = JSON.parse(localStorage.getItem('accessToken')).id;
+        let employeeDelivery = JSON.parse(localStorage.getItem('accessToken')).id;
         axios({
             method: 'put',
             url: `${admin_url}/carts/${id}`,
             data: {
                 id: cartId,
-                employeeConfirm: employeeConfirm,
-                employeeDelivery: searchState,
+                employeeConfirm: cart.confirmId,
+                employeeDelivery: employeeDelivery,
                 state: statusChange,
             },
         })
             .then(function (response) {
                 setIsUpdate(true);
                 Toast('success', 'Cập nhật thành công!');
-                if (JSON.parse(localStorage.getItem('accessToken')).departmentId == 'shipping') {
-                    setTimeout(() => Redirect('my-invoices'), 3000);
-                }
-                if (JSON.parse(localStorage.getItem('accessToken')).departmentId == 'confirm') {
-                    setTimeout(() => Redirect('invoices'), 3000);
-                }
+                setTimeout(() => Redirect('my-invoices'), 3000);
             })
             .catch(function (error) {
                 setIsUpdate(false);
@@ -113,30 +102,35 @@ function CartDetails() {
                         <div className="col-md-12">
                             <div className="card">
                                 <div className="card-header">
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                        <h3>THÔNG TIN ĐƠN HÀNG</h3>
+                                    </div>
+                                </div>
+                                <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div className="col-md-6 col-lg-4">
-                                            <div className="form-group form-group-default">
-                                                <div className="form-group">
-                                                    <label>Nhân viên giao hàng</label>
-                                                    <select
-                                                        className="form-control form-control"
-                                                        onChange={handleChangeState}
-                                                    >
-                                                        {employees.map((item) => (
-                                                            <option
-                                                                key={item.id}
-                                                                value={item.id}
-                                                                selected={item.id === cart.deliveryId}
-                                                            >
-                                                                {item.id + ' - ' + item.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                        {cart ? (
+                                            <>
+                                                <div className="col-md-6 col-lg-6">
+                                                    <h5>Tên khách hàng: {cart.customerName}</h5>
+                                                    <h5>Email: {cart.emailRevicer}</h5>
+
+                                                    <h5>Số điện thoại: {cart.phoneNumber}</h5>
+                                                    <h5>Địa chỉ: {cart.addressDelivery}</h5>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 col-lg-6"></div>
-                                        <div className="col-md-2 col-lg-2"></div>
+                                                <div className="col-md-6 col-lg-6">
+                                                    <h5>Nhân viên xác nhận: {cart.confirmName}</h5>
+                                                    <h5>Nhân viên vận chuyển: {cart.deliveryName}</h5>
+                                                    <h5>
+                                                        Đã thanh toán:{' '}
+                                                        {cart.isPaid === 'true' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                                    </h5>
+                                                    <h5>Ngày đặt: {Moment(cart.createDate).format('DD/MM/YYYY')}</h5>
+                                                    <h5>Ngày giao: {Moment(cart.dateDelivery).format('DD/MM/YYYY')}</h5>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="card-body">
@@ -147,7 +141,7 @@ function CartDetails() {
                                         >
                                             <br />
                                             <div className="input-icon">
-                                                <h3>Thông tin đơn hàng</h3>
+                                                <h3>Danh sách sản phẩm</h3>
                                             </div>
                                         </div>
                                         <div
@@ -156,7 +150,7 @@ function CartDetails() {
                                         >
                                             <br />
                                             <div className="input-icon">
-                                                <h4>Trạng thái : {states}</h4>
+                                                <h4>Trạng thái: {states}</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -220,27 +214,13 @@ function CartDetails() {
                                         </table>
                                     </div>
                                     <div className="row p-3" style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {states == constant.WAIT &&
-                                        JSON.parse(localStorage.getItem('accessToken')).departmentId == 'confirm' ? (
+                                        {states == constant.DELIVERING ? (
                                             <div>
                                                 <button
                                                     className="btn btn-primary btn-round ml-auto mr-5"
                                                     onClick={() => handleConfirm(id, states)}
                                                 >
                                                     <i className="fa fa-check" /> Xác nhận
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <></>
-                                        )}
-                                        {states == constant.DELIVERING &&
-                                        JSON.parse(localStorage.getItem('accessToken')).departmentId == 'shipping' ? (
-                                            <div>
-                                                <button
-                                                    className="btn btn-primary btn-round ml-auto mr-5"
-                                                    onClick={() => handleConfirm(id, states)}
-                                                >
-                                                    <i className="fa fa-check" /> Đã giao
                                                 </button>
                                             </div>
                                         ) : (
@@ -257,4 +237,4 @@ function CartDetails() {
     );
 }
 
-export default CartDetails;
+export default CartDetailsShipping;
