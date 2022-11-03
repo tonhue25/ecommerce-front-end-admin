@@ -112,7 +112,7 @@ function InventoryProduct() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <div className="row">
+                                    {/* <div className="row">
                                         <div className="col-md-6 col-lg-4">
                                             <div className="input-icon">
                                                 <input
@@ -126,11 +126,11 @@ function InventoryProduct() {
                                                     <i className="fa fa-search" />
                                                 </span>
                                             </div>
-                                        </div>
+                                        </div> 
                                         <br />
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
-                                    </div>
+                                    </div>*/}
                                     <PDFExport ref={pdfExportComponent} paperSize="A3">
                                         <div className="row mt-5">
                                             <div className="col-md-12 col-lg-12">

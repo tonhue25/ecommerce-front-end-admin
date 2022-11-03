@@ -1,23 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as ImportService from '../../services/ImportService';
+import * as OrderService from '../../services/OrderService';
 import { Pagination } from '@mui/material';
 import { PAGE_SIZE } from '../../services/constant';
 
 function Orders() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState();
-    const [imports, setImports] = useState([]);
+    const [orders, setOrders] = useState([]);
 
     useEffect(() => {
-        const getImports = async () => {
-            const result = await ImportService.getImports(page, PAGE_SIZE);
-            setImports(result.data.list);
-            console.log(result.data.list);
+        const getOrders = async () => {
+            const result = await OrderService.getOrders(page, PAGE_SIZE);
+            setOrders(result.data.list);
             setTotalPages(result.data.totalPages);
             return result.data.list;
         };
-        getImports();
+        getOrders();
     }, [page]);
 
     function handleChange(page) {
@@ -45,7 +44,7 @@ function Orders() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <Link to={'/detail-import'} style={{ color: 'white' }}>
+                                            <Link to={'/detail-order'} style={{ color: 'white' }}>
                                                 <button className="btn btn-primary btn-round ml-auto">
                                                     <i className="fa fa-plus " /> Thêm
                                                 </button>
@@ -56,21 +55,21 @@ function Orders() {
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>ID</th>
-                                                    <th>Order ID</th>
-                                                    <th>Create Date</th>
-                                                    <th>Employee</th>
+                                                    <th>Đơn hàng</th>
+                                                    <th>Ngày mua</th>
+                                                    <th>Nhà cung cấp</th>
+                                                    <th>Nhân viên lập</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {imports.map((item) => (
+                                                {orders.map((item) => (
                                                     <tr key={item.id}>
                                                         <td>{item.id}</td>
-                                                        <td>{item.order.id}</td>
-                                                        <td>{item.createDate}</td>
+                                                        <td>{item.purchaseDate}</td>
+                                                        <td>{item.supplier.name}</td>
                                                         <td>{item.employee.name}</td>
                                                         <td>
-                                                            <Link to={`/detail-import/${item.id}`}>
+                                                            <Link to={`/detail-order/${item.id}`}>
                                                                 <button className="btn btn-link btn-primary btn-lg">
                                                                     <i className="fa fa-eye"></i>
                                                                 </button>

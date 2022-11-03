@@ -100,6 +100,16 @@ function Sidebar() {
                                         </ul>
                                     </div>
                                 </li>
+                                <li className="nav-item">
+                                    <Link to={'/orders'}>
+                                        <p>Đặt hàng</p>
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to={'/imports'}>
+                                        <p>Nhập hàng</p>
+                                    </Link>
+                                </li>
                             </>
                         ) : (
                             <>

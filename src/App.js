@@ -13,9 +13,10 @@ import Customers from './screens/Customer/Customers';
 import UpdateCustomer from './screens/Customer/UpdateCustomer';
 import Employees from './screens/Employee/Employees';
 import UpdateEmployee from './screens/Employee/UpdateEmployee';
+import DetailOrder from './screens/Order/DetailOrder';
 import DetailImport from './screens/Import/DetailImport';
+import Orders from './screens/Order/Orders';
 import Imports from './screens/Import/Imports';
-import UpdateImport from './screens/Import/UpdateImport';
 import Login from './screens/Login';
 import Products from './screens/Product/Products';
 import UpdateProduct from './screens/Product/UpdateProduct';
@@ -60,9 +61,13 @@ function App() {
                     <Route path={'detail-invoices/:id'} element={<CartDetails />}></Route>
                     <Route path={'detail-shipping/:id'} element={<CartDetailsShipping />}></Route>
 
+                    <Route path={'orders'} element={<Orders />}></Route>
+                    <Route path={'detail-order/:id'} element={<DetailOrder />}></Route>
+                    <Route path={'detail-order'} element={<DetailOrder isReload={isReload} />}></Route>
+
                     <Route path={'imports'} element={<Imports />}></Route>
-                    <Route path={'update-import'} element={<UpdateImport />}></Route>
                     <Route path={'detail-import'} element={<DetailImport isReload={isReload} />}></Route>
+                    <Route path={'detail-import/:id'} element={<DetailImport />}></Route>
 
                     <Route path={'top-products'} element={<TopProduct />}></Route>
                     <Route path={'revenue-statistics'} element={<Revenue />}></Route>
