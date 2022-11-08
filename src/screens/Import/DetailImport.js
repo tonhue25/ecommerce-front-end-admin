@@ -74,7 +74,7 @@ function DetailImport() {
             .post(url, dataImport)
             .then((response) => {
                 setIsReload(true);
-                Toast('success', 'Thêm thành công!');
+                Toast('success', 'Successful!');
                 const getListOrderDetailByOrder = async () => {
                     const result = await OrderDetailService.getListOrderDetailByOrder(
                         id,
@@ -89,7 +89,7 @@ function DetailImport() {
                 setIsReload(false);
             })
             .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                Toast('error', 'An error occurred! Please try again!');
             });
     };
 
@@ -102,10 +102,10 @@ function DetailImport() {
             .post(url, dataDetailImport)
             .then((response) => {
                 setIsReload(true);
-                Toast('success', 'Thêm thành công!');
+                Toast('success', 'Successful!');
             })
             .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                Toast('error', 'An error occurred! Please try again!');
             });
         setIsReload(false);
     };

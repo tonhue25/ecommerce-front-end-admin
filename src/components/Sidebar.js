@@ -37,7 +37,7 @@ function Sidebar() {
                         <div className="info">
                             <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                                 <span>
-                                    {'Xin chào :' + data.name}
+                                    {'Welcome :' + data.name}
                                     <span className="user-level">{data.role}</span>
                                     <span className="caret" />
                                 </span>
@@ -51,50 +51,56 @@ function Sidebar() {
                             <>
                                 <li className="nav-item">
                                     <Link to={'/'}>
-                                        <p>Sản phẩm</p>
+                                        <p>Product</p>
+                                    </Link>
+                                </li>
+
+                                <li className="nav-item">
+                                    <Link to={'/categories'}>
+                                        <p>Category</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link to={'/categories'}>
-                                        <p>Danh mục</p>
+                                    <Link to={'/discounts'}>
+                                        <p>Discount</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to={'/employees'}>
-                                        <p>Nhân viên</p>
+                                        <p>Employee</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to={'/customers'}>
-                                        <p>Khách hàng</p>
+                                        <p>Customer</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to={'/invoices'}>
-                                        <p>Đơn hàng</p>
+                                        <p>Customer Order</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <a data-toggle="collapse" href="#tables">
                                         <i className="fas fa-table" />
-                                        <p>Thống kê</p>
+                                        <p>Statistic</p>
                                         <span className="caret" />
                                     </a>
                                     <div className="collapse" id="tables">
                                         <ul className="nav nav-collapse">
                                             <li>
                                                 <Link to={'/top-products'}>
-                                                    <p>Sản phẩm bán chạy</p>
+                                                    <p>Best seller</p>
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link to={'/revenue-statistics'}>
-                                                    <p>Thống kế doanh thu</p>
+                                                    <p>Revenue</p>
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link to={'/inventory-product'}>
-                                                    <p>Sản phẩm tồn kho</p>
+                                                    <p>Inventory</p>
                                                 </Link>
                                             </li>
                                         </ul>
@@ -102,12 +108,12 @@ function Sidebar() {
                                 </li>
                                 <li className="nav-item">
                                     <Link to={'/orders'}>
-                                        <p>Đặt hàng</p>
+                                        <p>Supplier Order</p>
                                     </Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to={'/imports'}>
-                                        <p>Nhập hàng</p>
+                                        <p>Import</p>
                                     </Link>
                                 </li>
                             </>
@@ -115,7 +121,7 @@ function Sidebar() {
                             <>
                                 <li className="nav-item">
                                     <Link to={'/my-invoices'}>
-                                        <p>Đơn hàng</p>
+                                        <p>Customer Order</p>
                                     </Link>
                                 </li>
                             </>

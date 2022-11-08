@@ -34,23 +34,22 @@ function ProductItem({ data, deleteProduct }) {
                     <img src={data.image} className="avatar-img rounded-circle" />
                 </p>
             </td>
-            <td>{data.name}</td>
-            <td>
+            <td style={{ width: '30%', justifyContent: 'center' }}>{data.name}</td>
+            <td style={{ width: '10%', justifyContent: 'center' }}>
                 {point > 0 ? (
                     <Rating precision={0.25} name="size-large" value={point || 0} size="small" readOnly />
                 ) : (
                     <span></span>
                 )}
             </td>
-            <td>
+            <td style={{ width: '10%', justifyContent: 'center' }}>
                 <CurrencyFormat value={data.inventoryNumber} displayType={'text'} thousandSeparator={true} />
             </td>
             <td>{discount > 0 ? discount + ' %' : ''} </td>
-            <td>
+            <td style={{ width: '20%', justifyContent: 'center' }}>
                 <CurrencyFormat value={data.price} displayType={'text'} thousandSeparator={true} suffix={' đ '} />
             </td>
-            {/* <td>{data.status === 'true' ? 'active' : 'Hết hàng'}</td> */}
-            <td>
+            <td style={{ width: '5%', justifyContent: 'center' }}>
                 <button
                     type="button"
                     className={
@@ -60,21 +59,8 @@ function ProductItem({ data, deleteProduct }) {
                     {data.status === 'true' ? <i class="fa fa-check"></i> : <i className="fa fa-times" />}
                 </button>
             </td>
-            <td>
-                <button
-                    type="button"
-                    data-toggle="tooltip"
-                    title="Edit"
-                    className="btn btn-link btn-primary btn-lg"
-                    data-original-title="Edit Task"
-                >
-                    <Link to={`/comments/${data.id}`}>
-                        <i className="fa fa-eye"></i>
-                    </Link>
-                </button>
-            </td>
-            <td>
-                <div className="form-button-action">
+            <td style={{ width: '5%', justifyContent: 'center' }}>
+                <Link to={`/comments/${data.id}`}>
                     <button
                         type="button"
                         data-toggle="tooltip"
@@ -82,10 +68,31 @@ function ProductItem({ data, deleteProduct }) {
                         className="btn btn-link btn-primary btn-lg"
                         data-original-title="Edit Task"
                     >
-                        <Link to={'/update-product/' + data.id}>
-                            <i className="fa fa-edit"></i>
-                        </Link>
+                        <i className="fa fa-eye"></i>
                     </button>
+                </Link>
+            </td>
+
+            <td style={{ width: '5%', justifyContent: 'center' }}>
+                <Link to={`/warranty/${data.id}`}>
+                    <button type="button" className="btn btn-link btn-primary btn-lg">
+                        <i class="fa fa-lock" aria-hidden="true"></i>
+                    </button>
+                </Link>
+            </td>
+            <td style={{ width: '5%', justifyContent: 'center' }}>
+                <div className="form-button-action">
+                    <Link to={'/update-product/' + data.id}>
+                        <button
+                            type="button"
+                            data-toggle="tooltip"
+                            title="Edit"
+                            className="btn btn-link btn-primary btn-lg"
+                            data-original-title="Edit Task"
+                        >
+                            <i className="fa fa-edit"></i>
+                        </button>
+                    </Link>
                     <button
                         onClick={() => deleteProduct(data.id)}
                         type="button"

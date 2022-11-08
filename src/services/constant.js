@@ -1,5 +1,5 @@
 export const PAGE_ONE = 1;
-export const PAGE_SIZE = 2;
+export const PAGE_SIZE = 5;
 export const BestSelling = 10;
 export const PRODUCT_ACTIVE = 1;
 export const PRODUCT_INACTIVE = 0;

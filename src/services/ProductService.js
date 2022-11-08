@@ -44,3 +44,12 @@ export const getBestSellingProduct = async (page, size, startDate, endDate) => {
     });
     return res;
 };
+
+export const getListForDiscountProduct = async (discountId) => {
+    const res = await request_admin.get('/products/list_for_discount', {
+        params: {
+            discountId,
+        },
+    });
+    return res;
+};

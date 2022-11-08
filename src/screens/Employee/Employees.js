@@ -85,7 +85,7 @@ function Employees() {
                                             className="col-md-12 col-lg-12"
                                             style={{ display: 'flex', justifyContent: 'center' }}
                                         >
-                                            <h3>Quản lý nhân viên</h3>
+                                            <h3>Employee management</h3>
                                         </div>
                                     </div>
                                 </div>

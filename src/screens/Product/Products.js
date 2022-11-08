@@ -85,7 +85,7 @@ function Products() {
                                             className="col-md-12 col-lg-12"
                                             style={{ display: 'flex', justifyContent: 'center' }}
                                         >
-                                            <h3>Quản lý sản phẩm</h3>
+                                            <h3>Product management</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -159,16 +159,17 @@ function Products() {
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Mã</th>
-                                                    <th>Ảnh</th>
-                                                    <th>Tên sản phẩm</th>
+                                                    <th>ID</th>
+                                                    <th>Image</th>
+                                                    <th>Name</th>
                                                     <th></th>
-                                                    <th>Số lượng tồn</th>
-                                                    <th>Giảm</th>
-                                                    <th>Giá gốc</th>
-                                                    <th>Trạng thái</th>
-                                                    <th>Bình luận</th>
-                                                    <th></th>
+                                                    <th>Quantity</th>
+                                                    <th>Discount</th>
+                                                    <th>Price</th>
+                                                    <th>Status</th>
+                                                    <th>Comment</th>
+                                                    <th>Warranty</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>{ShowProducts(products)}</tbody>

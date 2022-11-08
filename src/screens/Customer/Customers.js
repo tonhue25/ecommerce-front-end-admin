@@ -62,7 +62,7 @@ function Customers() {
                                             className="col-md-12 col-lg-12"
                                             style={{ display: 'flex', justifyContent: 'center' }}
                                         >
-                                            <h3>Quản lý khách hàng</h3>
+                                            <h3>Customer management</h3>
                                         </div>
                                     </div>
                                 </div>

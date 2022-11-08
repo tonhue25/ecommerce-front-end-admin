@@ -136,7 +136,10 @@ function CartDetails() {
                                             </div>
                                         </div>
                                         <div className="col-md-4 col-lg-6"></div>
-                                        <div className="col-md-2 col-lg-2"></div>
+                                        <div className="col-md-2 col-lg-2">
+                                            {/* xuất hóa đơn ở đây */}
+                                            <button className="btn btn-primary btn-round ml-auto">Invoice</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="card-body">

@@ -60,42 +60,38 @@ function UpdateEmployee() {
         // data.password = '';
 
         if (data.id === '') {
-            Toast('warning', 'Vui lòng nhập mã!');
+            Toast('warning', 'Please enter id!');
             return;
         }
         if (data.email === '') {
-            Toast('warning', 'Vui lòng nhập email!');
+            Toast('warning', 'Please enter email!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Vui lòng nhập tên!');
+            Toast('warning', 'Please enter name!');
             return;
         }
         if (data.birthday === '') {
-            Toast('warning', 'Vui lòng nhập ngày sinh!');
+            Toast('warning', 'Please enter birthday!');
             return;
         }
         if (data.address === '') {
-            Toast('warning', 'Vui lòng nhập địa chỉ!');
+            Toast('warning', 'Please enter address!');
             return;
         }
         if (data.salary === '') {
-            Toast('warning', 'Vui lòng nhập lương!');
+            Toast('warning', 'Please enter salary!');
             return;
         } else {
             const url = `${admin_url}/employees`;
             axios
                 .post(url, data)
                 .then((response) => {
-                    if (isUpdate) {
-                        Toast('success', 'Chỉnh sửa thành công!');
-                    } else {
-                        Toast('success', 'Thêm mới thành công!');
-                    }
+                    Toast('success', 'Successful!');
                     setTimeout(() => Redirect('employees'), 3000);
                 })
                 .catch((error) => {
-                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                    Toast('error', 'An error occurred! Please try again!');
                 });
         }
     };
@@ -103,7 +99,7 @@ function UpdateEmployee() {
     const handleClickCancel = (e) => {
         e.preventDefault();
         swal({
-            title: 'Hủy chỉnh sửa?',
+            title: 'Cancel?',
             icon: 'warning',
             buttons: true,
             dangerMode: true,
@@ -132,23 +128,23 @@ function UpdateEmployee() {
                                         <div className="row">
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="id">Mã nhân viên</label>
+                                                    <label htmlFor="id">id</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Nhập mã"
+                                                        placeholder="id"
                                                         name="id"
                                                         value={data.id || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Tên nhân viên</label>
+                                                    <label htmlFor="name">name</label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
-                                                        placeholder="Nhập tên"
+                                                        placeholder="name"
                                                         name="name"
                                                         value={data.name || ''}
                                                         onChange={onChange}
@@ -183,7 +179,7 @@ function UpdateEmployee() {
                                                     </select>
                                                 </div>
                                                 <div className="form-check mb-1 mt-1">
-                                                    <label>Trạng thái</label>
+                                                    <label>status</label>
                                                     <br />
                                                     <div style={{ textAlign: 'center' }}>
                                                         <div name="status" onChange={onChange}>
@@ -226,7 +222,7 @@ function UpdateEmployee() {
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="quantity">Lương</label>
+                                                    <label htmlFor="quantity">salary</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="number"
@@ -238,7 +234,7 @@ function UpdateEmployee() {
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="description">Địa chỉ</label>
+                                                    <label htmlFor="description">address</label>
                                                     <textarea
                                                         className="form-control"
                                                         rows={8}
@@ -253,10 +249,10 @@ function UpdateEmployee() {
 
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
-                                            {isUpdate ? 'Cập nhật' : 'Thêm'}
+                                            {isUpdate ? 'Update' : 'Add'}
                                         </button>
                                         <button type="cancel" className="btn btn-danger" onClick={handleClickCancel}>
-                                            Hủy
+                                            Cancel
                                         </button>
                                     </div>
                                 </div>

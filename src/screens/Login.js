@@ -12,11 +12,11 @@ function Login({ setAccessToken }) {
     const handleLogin = async (e) => {
         e.preventDefault();
         if (id == '') {
-            Toast('warning', 'Vui lòng nhập tài khoản đăng nhập!');
+            Toast('warning', 'Please enter id!');
             return;
         }
         if (password == '') {
-            Toast('warning', 'Vui lòng nhập mật khẩu!');
+            Toast('warning', 'Please enter password!');
             return;
         }
         const url = `${admin_url}/login`;
@@ -32,10 +32,10 @@ function Login({ setAccessToken }) {
             }
         } catch (err) {
             if (err.response.data.message == 'account.not.active') {
-                Toast('error', 'Tài khoản không hoạt động, vui lòng kích hoạt lại!');
+                Toast('error', 'Inactive account!!');
                 return;
             }
-            Toast('error', 'Tên đăng nhập hoặc mật khẩu không chính xác!');
+            Toast('error', 'Incorrect username or password! Please try again!');
             return;
         }
     };

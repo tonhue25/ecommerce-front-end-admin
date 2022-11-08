@@ -11,19 +11,24 @@ import UpdateCategory from './screens/Category/UpdateCategory';
 import Comments from './screens/Comment/Comments';
 import Customers from './screens/Customer/Customers';
 import UpdateCustomer from './screens/Customer/UpdateCustomer';
+import DetailDiscount from './screens/Discount/DetailDiscount';
+import Discount from './screens/Discount/Discount';
+import UpdateDiscount from './screens/Discount/UpdateDiscount';
 import Employees from './screens/Employee/Employees';
 import UpdateEmployee from './screens/Employee/UpdateEmployee';
-import DetailOrder from './screens/Order/DetailOrder';
 import DetailImport from './screens/Import/DetailImport';
-import Orders from './screens/Order/Orders';
 import Imports from './screens/Import/Imports';
 import Login from './screens/Login';
+import DetailOrder from './screens/Order/DetailOrder';
+import Orders from './screens/Order/Orders';
 import Products from './screens/Product/Products';
 import UpdateProduct from './screens/Product/UpdateProduct';
 import InventoryProduct from './screens/Statistic/InventoryProduct';
 import Revenue from './screens/Statistic/Revenue';
 import TopProduct from './screens/Statistic/TopProduct';
+import Warranty from './screens/Warranty/Warranty';
 import ExportPDF from './utils/ExportPDF';
+
 function App() {
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
     const [isReload, setIsReload] = useState(false);
@@ -76,6 +81,15 @@ function App() {
                     <Route path={'export-revenue'} element={<ExportPDF />}></Route>
 
                     <Route path={'my-invoices'} element={<MyCarts />}></Route>
+
+                    <Route path={'warranty/:productId'} element={<Warranty />}></Route>
+
+                    <Route path={'discounts'} element={<Discount />}></Route>
+
+                    <Route path={'update-discount'} element={<UpdateDiscount />}></Route>
+                    <Route path={'update-discount/:discountId'} element={<UpdateDiscount />}></Route>
+
+                    <Route path={'update-discount-detail/:discountId'} element={<DetailDiscount />}></Route>
                 </Route>
             </Routes>
         </div>

@@ -1,13 +1,15 @@
 import { ToastContainer } from 'react-toastify';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import * as CategoryService from '../../services/CategoryService';
 import * as ProductService from '../../services/ProductService';
 import { admin_url, public_url } from '../../services/base_url';
 import axios from 'axios';
 import Toast from '../../utils/Toast';
-import Redirect from '../../utils/Redirect';
+
 import { useParams } from 'react-router-dom';
 import swal from 'sweetalert';
+import Redirect from '../../utils/Redirect';
+import { CKEditor } from 'ckeditor4-react';
 function UpdateProduct() {
     let { productId } = useParams();
     const [categories, setCategories] = useState([]);
@@ -60,36 +62,32 @@ function UpdateProduct() {
         e.preventDefault();
         const url = `${admin_url}/products`;
         if (data.id === '') {
-            Toast('warning', 'Vui lòng nhập mã!');
+            Toast('warning', 'Please enter id!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Vui lòng nhập tên!');
+            Toast('warning', 'Please enter name!');
             return;
         }
         if (data.price === '') {
-            Toast('warning', 'Vui lòng nhập giá!');
+            Toast('warning', 'Please enter price!');
             return;
         }
         if (data.inventoryNumber === '') {
-            Toast('warning', 'Vui lòng nhập số lượng tồn!');
+            Toast('warning', 'Please enter inventoryNumber!');
             return;
         } else {
             axios
                 .post(url, data)
                 .then((response) => {
-                    if (isUpdate) {
-                        Toast('success', 'Chỉnh sửa thành công!');
-                    } else {
-                        Toast('success', 'Thêm mới thành công!');
-                    }
+                    Toast('success', 'Successful!');
                     if (file) {
                         uploadFile(response.data.id);
                     }
                     setTimeout(() => Redirect(''), 5000);
                 })
                 .catch((error) => {
-                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                    Toast('error', 'An error occurred! Please try again!');
                 });
         }
     };
@@ -276,6 +274,8 @@ function UpdateProduct() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
                                                     <input
                                                         type="file"
@@ -312,8 +312,6 @@ function UpdateProduct() {
                                                         <div className="col-4 col-sm-4"></div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
                                                     <label htmlFor="price">Giá</label>
                                                     <input
@@ -337,21 +335,48 @@ function UpdateProduct() {
                                                         value={data.inventoryNumber || ''}
                                                     />
                                                 </div>
-                                                <div className="form-group">
-                                                    <label htmlFor="description">Mô tả sản phẩm</label>
-                                                    <textarea
-                                                        className="form-control"
-                                                        id="description"
-                                                        rows={8}
-                                                        name="description"
-                                                        onChange={onChange}
-                                                        value={data.description || ''}
-                                                    />
-                                                </div>
                                             </div>
                                         </div>
+                                        <div className="form-group">
+                                            <label htmlFor="description">Mô tả sản phẩm</label>
+                                            <textarea
+                                                className="form-control"
+                                                id="description"
+                                                rows={8}
+                                                name="description"
+                                                onChange={onChange}
+                                                value={data.description || ''}
+                                            />
+                                        </div>
+                                        {/* <div className="form-group">
+                                            <label htmlFor="description">Mô tả sản phẩm</label>
+                                            <CKEditor
+                                                editorUrl="https://your-website.example/ckeditor/ckeditor.js"
+                                                initData={data.description}
+                                                name="description"
+                                                onNamespaceLoaded={(CKEDITOR) => {
+                                                    // Handles `namespaceLoaded` event which is fired once the CKEDITOR namespace is loaded.
+                                                    // This event is emitted only once.
+                                                }}
+                                                onBeforeLoad={(CKEDITOR) => {
+                                                    // Handles `beforeLoad` event which is fired before an editor instance is created.
+                                                }}
+                                                onInstanceReady={({ editor }) => {
+                                                    // Handles native `instanceReady` event.
+                                                }}
+                                                onFocus={({ editor }) => {
+                                                    // Handles native `focus` event.
+                                                }}
+                                                onCustomEvent={({ editor }) => {
+                                                    // Handles custom `customEvent` event.
+                                                }}
+                                                onChange={onChange}
+                                                readOnly={false}
+                                                style={{ borderColor: 'blue' }}
+                                                type="classic"
+                                            />
+                                        </div> */}
                                     </div>
-
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
                                             {isUpdate ? 'Cập nhập' : 'Thêm mới'}

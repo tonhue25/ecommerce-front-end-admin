@@ -43,28 +43,24 @@ function UpdateCategory() {
         e.preventDefault();
         const url = `${admin_url}/categories`;
         if (data.id === '') {
-            Toast('warning', 'Vui lòng nhập mã!');
+            Toast('warning', 'Please enter id!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Vui lòng nhập tên!');
+            Toast('warning', 'Please enter name!');
             return;
         } else {
             axios
                 .post(url, data)
                 .then((response) => {
-                    if (isUpdate) {
-                        Toast('success', 'Chỉnh sửa thành công!');
-                    } else {
-                        Toast('success', 'Thêm mới thành công!');
-                    }
+                    Toast('success', 'Successful!');
                     if (file) {
                         uploadFile(response.data.id);
                     }
                     setTimeout(() => Redirect('categories'), 3000);
                 })
                 .catch((error) => {
-                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                    Toast('error', 'An error occurred! Please try again!');
                 });
         }
     };
@@ -72,7 +68,7 @@ function UpdateCategory() {
     const handleClickCancel = (e) => {
         e.preventDefault();
         swal({
-            title: 'Hủy chỉnh sửa?',
+            title: 'Cancel?',
             icon: 'warning',
             buttons: true,
             dangerMode: true,
