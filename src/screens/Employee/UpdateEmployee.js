@@ -1,13 +1,15 @@
-import { ToastContainer } from 'react-toastify';
-import { useState, useEffect } from 'react';
-import { admin_url } from '../../services/base_url';
 import axios from 'axios';
-import Toast from '../../utils/Toast';
-import Redirect from '../../utils/Redirect';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
-import * as EmployeeService from '../../services/EmployeeService';
+import { admin_url } from '../../services/base_url';
+import { EMPLOYEE, ERROR, SUCCESS, WARNING } from '../../services/constant';
 import * as DepartmentService from '../../services/DepartmentService';
+import * as EmployeeService from '../../services/EmployeeService';
+import { employees } from '../../services/link_redirect';
+import Redirect from '../../utils/Redirect';
+import Toast from '../../utils/Toast';
 function UpdateEmployee() {
     let { employeeId } = useParams();
     const [departments, setDepartments] = useState([]);
@@ -26,8 +28,8 @@ function UpdateEmployee() {
         if (employeeId != null) {
             const getOne = async () => {
                 const result = await EmployeeService.getOne(employeeId);
-                setData(result.data);
-                return result.data;
+                setData(result.data.data);
+                return result.data.data;
             };
             getOne();
         }
@@ -46,52 +48,64 @@ function UpdateEmployee() {
     };
 
     useEffect(() => {
-        const getAllDepartments = async () => {
+        const getDepartments = async () => {
             const result = await DepartmentService.getAllDepartments();
-            setDepartments(result.data);
-            return result.data;
+            if (result.data.http_code == SUCCESS) {
+                setDepartments(result.data.data);
+            }
         };
-        getAllDepartments();
+        getDepartments();
     }, []);
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        data.roleId = 'employee';
-        // data.password = '';
-
+        data.roleId = EMPLOYEE;
         if (data.id === '') {
-            Toast('warning', 'Please enter id!');
+            Toast(WARNING, 'Please enter id!');
             return;
         }
         if (data.email === '') {
-            Toast('warning', 'Please enter email!');
+            Toast(WARNING, 'Please enter email!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Please enter name!');
+            Toast(WARNING, 'Please enter name!');
             return;
         }
         if (data.birthday === '') {
-            Toast('warning', 'Please enter birthday!');
+            Toast(WARNING, 'Please enter birthday!');
             return;
         }
         if (data.address === '') {
-            Toast('warning', 'Please enter address!');
+            Toast(WARNING, 'Please enter address!');
             return;
         }
         if (data.salary === '') {
-            Toast('warning', 'Please enter salary!');
+            Toast(WARNING, 'Please enter salary!');
             return;
         } else {
-            const url = `${admin_url}/employees`;
+            const url = `${admin_url}${employees}`;
+            console.log(url);
+            console.log(data);
             axios
-                .post(url, data)
+                .post(url, {
+                    id: 'confirm002',
+                    email: 'huynguyen@gmail.com',
+                    name: 'Huy Nguyễn',
+                    birthday: '2000-12-24',
+                    address: 'Thủ Đức',
+                    salary: 12000000,
+                    departmentId: 'confirm',
+                    status: 1,
+                    roleId: 'EMPLOYEE',
+                })
                 .then((response) => {
-                    Toast('success', 'Successful!');
-                    setTimeout(() => Redirect('employees'), 3000);
+                    Toast(SUCCESS, 'Successful!');
+                    setTimeout(() => Redirect(employees), 3000);
                 })
                 .catch((error) => {
-                    Toast('error', 'An error occurred! Please try again!');
+                    console.log(error);
+                    Toast(ERROR, 'An error occurred! Please try again!');
                 });
         }
     };
@@ -105,7 +119,7 @@ function UpdateEmployee() {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                setTimeout(() => Redirect('employees'), 1000);
+                setTimeout(() => Redirect(employees), 1000);
             }
         });
     };

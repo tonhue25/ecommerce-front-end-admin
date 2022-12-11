@@ -1,65 +1,72 @@
 import { useEffect, useState } from 'react';
-import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
+import { PAGE_ONE, PAGE_SIZE, SUCCESS, WARNING } from '../../services/constant';
 import EmployeeItem from './../Employee/EmployeeItem';
 import * as EmployeeService from '../../services/EmployeeService';
 import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
 import * as DepartmentService from '../../services/DepartmentService';
+import axios from 'axios';
+import { admin_url } from '../../services/base_url';
+import { employees, update_employees } from '../../services/link_redirect';
 function Employees() {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(PAGE_ONE);
     const [departments, setDepartments] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
-    const [searchDepartment, setSearchDepartment] = useState('');
-    const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
+    const [searchDepartment, setSearchDepartment] = useState([]);
     const [isDelete, setIsDelete] = useState(false);
+    const [data, setData] = useState([]);
+
+    const [dataSubmit, setDataSubmit] = useState({
+        size: PAGE_SIZE,
+        page: page,
+        search: '',
+        departmentId: [],
+    });
 
     useEffect(() => {
+        dataSubmit.departmentId = [];
+        if (searchDepartment.length > 0) {
+            dataSubmit.departmentId = [searchDepartment];
+        }
+        dataSubmit.page = page;
         const getListEmployee = async () => {
-            const result = await EmployeeService.getListEmployee(
-                page,
-                itemDisplay,
-                searchValue,
-                'false',
-                searchDepartment,
-            );
-            setProducts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data;
+            axios
+                .post(`${admin_url}/${employees}/list`, dataSubmit)
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setData(response.data.data);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
         getListEmployee();
-    }, [page, itemDisplay, searchValue, searchDepartment, isDelete]);
-
-    function ShowProducts(products) {
-        return products.map((item) => (
-            <EmployeeItem key={item.id} data={item} deleteItem={() => deleteItem(item.id, item.status)} />
-        ));
-    }
+    }, [dataSubmit, searchDepartment, page, isDelete]);
 
     useEffect(() => {
-        const getAllDepartments = async () => {
+        const getDepartments = async () => {
             const result = await DepartmentService.getAllDepartments();
-            setDepartments(result.data);
-            return result.data;
+            if (result.data.http_code == SUCCESS) {
+                setDepartments(result.data.data);
+            }
         };
-        getAllDepartments();
+        getDepartments();
     }, []);
 
     const deleteItem = (id, status) => {
-        if (status == 'true') {
+        if (id == JSON.parse(localStorage.getItem('accessToken')).data.account.id) {
+            Toast(WARNING, 'not authorized to delete!!');
+        }
+        if (status == 'true' && !(id == JSON.parse(localStorage.getItem('accessToken')).data.account.id)) {
             const deleteItem = async () => {
                 const result = await EmployeeService.deleteItem(id);
                 setIsDelete(true);
-                Toast('success', 'Đã xóa nhân viên!!');
+                Toast(SUCCESS, 'deleted!!');
             };
             deleteItem();
             setIsDelete(false);
-        } else {
-            Toast('warning', 'Nhân viên đã xóa!!');
         }
     };
 
@@ -70,6 +77,26 @@ function Employees() {
     function handleChange(page) {
         setPage(page);
     }
+
+    const showData = (data) => {
+        if (data.size > 0) {
+            const Items = [];
+            for (let i = 0; i < data.size; i++) {
+                Items.push(
+                    <EmployeeItem
+                        key={data.list[i].id}
+                        data={data.list[i]}
+                        deleteItem={() => deleteItem(data.list[i].id, data.list[i].status)}
+                    />,
+                );
+            }
+            return Items;
+        }
+    };
+
+    const onChange = (e) => {
+        setDataSubmit({ ...dataSubmit, [e.target.name]: e.target.value });
+    };
 
     return (
         <div className="main-panel">
@@ -98,10 +125,11 @@ function Employees() {
                                                     <select
                                                         className="form-control form-control"
                                                         onChange={handleChangeDepartment}
+                                                        name="departmentId"
                                                     >
-                                                        <option value="">Tất cả</option>
+                                                        <option value={[]}>Tất cả</option>
                                                         {departments.map((item) => (
-                                                            <option key={item.id} value={item.id}>
+                                                            <option key={item.id} value={item.id} name="departmentId">
                                                                 {item.name}
                                                             </option>
                                                         ))}
@@ -114,11 +142,8 @@ function Employees() {
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
                                                     <label>Số item hiển thị</label>
-                                                    <select
-                                                        className="form-control"
-                                                        onChange={(e) => setItemDisplay(e.target.value)}
-                                                    >
-                                                        <option>5</option>
+                                                    <select name="size" onChange={onChange} className="form-control">
+                                                        <option>{PAGE_SIZE}</option>
                                                         <option>10</option>
                                                         <option>15</option>
                                                         <option>20</option>
@@ -133,8 +158,9 @@ function Employees() {
                                         <div className="col-md-6 col-lg-4">
                                             <div className="input-icon">
                                                 <input
-                                                    value={searchValue}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
+                                                    name="search"
+                                                    value={dataSubmit.search || ''}
+                                                    onChange={onChange}
                                                     type="text"
                                                     className="form-control"
                                                     placeholder="Nhập tên..."
@@ -148,7 +174,7 @@ function Employees() {
                                         <div className="col-md-4 col-lg-6"></div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <Link to={'/update-employee'} style={{ color: 'white' }}>
+                                            <Link to={update_employees} style={{ color: 'white' }}>
                                                 <button className="btn btn-primary btn-round ml-auto">
                                                     <i className="fa fa-plus " /> Thêm nhân viên
                                                 </button>
@@ -169,14 +195,14 @@ function Employees() {
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{ShowProducts(products)}</tbody>
+                                            <tbody>{showData(data)}</tbody>
                                         </table>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {data.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={data.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

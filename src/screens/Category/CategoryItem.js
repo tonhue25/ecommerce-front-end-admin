@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-// import Toast from '../../../src/components/Toast';
+import { update_categories } from '../../services/link_redirect';
 function CategoryItem({ data, deleteCategory }) {
     return (
         <tr>
@@ -12,7 +12,7 @@ function CategoryItem({ data, deleteCategory }) {
             <td style={{ width: '20%' }}>{data.name}</td>
             <td style={{ width: '20%' }}>
                 <div className="form-button-action">
-                    <Link to={'/update-category/' + data.id}>
+                    <Link to={`${update_categories}/${data.id}`}>
                         <button
                             type="button"
                             title="Edit"

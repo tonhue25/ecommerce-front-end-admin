@@ -8,7 +8,6 @@ import Moment from 'moment';
 function Carts() {
     const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
     const [searchState, setSearchState] = useState('');
     const [searchCustomer, setSearchCustomer] = useState('');
     const [carts, setCarts] = useState([]);
@@ -18,7 +17,6 @@ function Carts() {
         const getAllStates = async () => {
             const result = await StateService.getAllStates();
             setStates(result.data);
-            console.log(result.data);
             return result.data;
         };
         getAllStates();
@@ -71,7 +69,7 @@ function Carts() {
                                             className="col-md-12 col-lg-12"
                                             style={{ display: 'flex', justifyContent: 'center' }}
                                         >
-                                            <h3>Quản lý đơn hàng</h3>
+                                            <h3>Customer-Order management</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -96,38 +94,19 @@ function Carts() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <div className="row">
-                                        <div className="col-md-6 col-lg-4">
-                                            {/* <div className="input-icon">
-                                                <input
-                                                    value={searchValue}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Nhập tên khách hàng..."
-                                                />
-                                                <span className="input-icon-addon">
-                                                    <i className="fa fa-search" />
-                                                </span>
-                                            </div> */}
-                                        </div>
-                                        <br />
-                                        <div className="col-md-4 col-lg-6"></div>
-                                        <br />
-                                    </div>
                                     <div className="table-responsive">
                                         <table className="display table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th style={{ width: '10px' }}>Đơn hàng</th>
-                                                    <th>Khách hàng</th>
-                                                    <th>Ngày mua</th>
-                                                    <th>Ngày giao</th>
-                                                    <th>Xác nhận</th>
-                                                    <th>Vận chuyển</th>
-                                                    <th>Địa chỉ</th>
-                                                    <th>Thanh toán</th>
-                                                    <th>Trạng thái</th>
+                                                    <th style={{ width: '10px' }}>ID</th>
+                                                    <th>Customer</th>
+                                                    <th>Order date</th>
+                                                    <th>Delivery date</th>
+                                                    <th>Confirm</th>
+                                                    <th>Shipper</th>
+                                                    <th>Address</th>
+                                                    <th>Paid?</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -135,9 +114,7 @@ function Carts() {
                                                     <tr key={item.id}>
                                                         <td style={{ width: '10px' }}>{item.id}</td>
                                                         <td>{item.customerName}</td>
-                                                        {/* <td>{item.createDate}</td> */}
                                                         <td>{Moment(item.createDate).format('DD/MM/YYYY')}</td>
-                                                        {/* <td>{item.dateDelivery}</td> */}
                                                         <td>
                                                             {item.dateDelivery
                                                                 ? Moment(item.dateDelivery).format('DD/MM/YYYY')
@@ -166,10 +143,8 @@ function Carts() {
                                                         <td>
                                                             <button
                                                                 type="button"
-                                                                data-toggle="tooltip"
-                                                                title="Edit"
+                                                                title="View"
                                                                 className="btn btn-link btn-primary btn-lg"
-                                                                data-original-title="Edit Task"
                                                             >
                                                                 <Link to={`/detail-invoices/${item.id}`}>
                                                                     <i className="fa fa-eye"></i>

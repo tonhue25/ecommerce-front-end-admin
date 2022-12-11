@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
 import * as CartDetailService from '../../services/CartDetailService';
 import * as EmployeeService from '../../services/EmployeeService';
 import * as CartService from '../../services/CartService';
@@ -17,7 +16,7 @@ import { useRef } from 'react';
 import Moment from 'moment';
 import * as InvoiceService from '../../services/InvoiceService';
 import { Link } from 'react-router-dom';
-function CartDetails() {
+function DetailReturnOrder() {
     let { id } = useParams();
 
     const [employees, setEmployees] = useState([]);
@@ -114,7 +113,7 @@ function CartDetails() {
         }
         axios({
             method: 'post',
-            url: `${admin_url}/invoices`,
+            url: `${admin_url}/return-orders`,
             data: dataInvoice,
         })
             .then(function (response) {
@@ -152,56 +151,21 @@ function CartDetails() {
                             <div className="card">
                                 <div className="card-header">
                                     <div className="d-flex align-items-center">
-                                        <div className="col-md-6 col-lg-4">
-                                            <div className="form-group form-group-default">
-                                                {cart ? (
-                                                    <div className="form-group">
-                                                        <label>Nhân viên giao hàng</label>
-                                                        <select
-                                                            className="form-control form-control"
-                                                            onChange={handleChangeState}
-                                                        >
-                                                            {employees.map((item) => (
-                                                                <option
-                                                                    key={item.id}
-                                                                    value={item.id}
-                                                                    selected={item.id === cart.deliveryId}
-                                                                >
-                                                                    {item.id + ' - ' + item.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                ) : (
-                                                    <></>
-                                                )}
-                                            </div>
-                                        </div>
+                                        <div className="col-md-6 col-lg-4"></div>
                                         <div className="col-md-4 col-lg-6"></div>
                                         <div className="col-md-2 col-lg-2">
-                                            {invoice ? (
-                                                <Link to={`/invoice/${id}`} style={{ color: 'white' }}>
-                                                    <button
-                                                        onClick={() => saveInvoice()}
-                                                        className="btn btn-primary btn-round ml-auto"
-                                                    >
-                                                        View Invoice
-                                                    </button>
-                                                </Link>
-                                            ) : (
-                                                <button
-                                                    onClick={() => saveInvoice()}
-                                                    className="btn btn-primary btn-round ml-auto"
-                                                >
-                                                    Export Invoice
-                                                </button>
-                                            )}
+                                            <button
+                                                onClick={() => saveInvoice()}
+                                                className="btn btn-primary btn-round ml-auto"
+                                            >
+                                                Return
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                                 <div ref={componentRef}>
                                     <div style={{ display: 'flex', justifyContent: 'center' }} className="m-4">
-                                        <h3>ORDER DETAILS</h3>
+                                        <h3>RETURN ORDER DETAILS</h3>
                                     </div>
                                     <div className="card-header">
                                         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -363,4 +327,4 @@ function CartDetails() {
     );
 }
 
-export default CartDetails;
+export default DetailReturnOrder;

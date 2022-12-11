@@ -11,14 +11,14 @@ function UpdateCustomer() {
     let { customerId } = useParams();
 
     const [data, setData] = useState({
-        cardId: '',
+        id: '',
         email: '',
         name: '',
         address: '',
         phoneNumber: '',
         taxCode: '',
         accountId: '',
-        roleId: 'customer',
+        roleId: 'CUSTOMER',
         status: 'true',
         password: '',
     });
@@ -27,7 +27,7 @@ function UpdateCustomer() {
         if (customerId != null) {
             const getOne = async () => {
                 const result = await CustomerService.getOne(customerId);
-                setData(result.data);
+                setData(result.data.data);
                 return result.data;
             };
             getOne();
@@ -120,14 +120,14 @@ function UpdateCustomer() {
                                         <div className="row">
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
-                                                    <label htmlFor="id">Chứng minh nhân dân</label>
+                                                    <label htmlFor="id">ID</label>
                                                     <input
                                                         disabled={isUpdate ? true : false}
                                                         type="text"
                                                         className="form-control"
                                                         placeholder="Nhập chứng minh nhân dân"
-                                                        name="cardId"
-                                                        value={data.cardId || ''}
+                                                        name="id"
+                                                        value={data.id || ''}
                                                         onChange={onChange}
                                                     />
                                                 </div>

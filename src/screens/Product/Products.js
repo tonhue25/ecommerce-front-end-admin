@@ -1,45 +1,84 @@
 import { useEffect, useState } from 'react';
 import * as ProductService from '../../services/ProductService';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
+import { PAGE_SIZE, PAGE_ONE, SUCCESS, WARNING } from '../../services/constant';
 import ProductItem from './ProductItem';
 import * as CategoryService from '../../services/CategoryService';
 import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
+
+import { useReactToPrint } from 'react-to-print';
+import { useRef } from 'react';
+import { public_url } from '../../services/base_url';
+import axios from 'axios';
+import { categories, products, update_products } from '../../services/link_redirect';
 function Products() {
     const [page, setPage] = useState(PAGE_ONE);
-    const [categories, setCategories] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
-    const [searchCategory, setSearchCategory] = useState('');
-    const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
+    const [dataCategories, setDataCategories] = useState([]);
+    const [searchCategory, setSearchCategory] = useState([]);
     const [isDelete, setIsDelete] = useState(false);
+    const [data, setData] = useState([]);
+
+    const [dataSubmit, setDataSubmit] = useState({
+        size: PAGE_SIZE,
+        page: page,
+        search: '',
+        categoryId: [],
+    });
 
     useEffect(() => {
-        const getListProduct = async () => {
-            const result = await ProductService.getListProduct(page, itemDisplay, 0, searchValue, searchCategory);
-            setProducts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data;
+        dataSubmit.categoryId = [];
+        if (searchCategory.length > 0) {
+            dataSubmit.categoryId = [searchCategory];
+        }
+        dataSubmit.page = page;
+        const getListEmployee = async () => {
+            axios
+                .post(`${public_url}/${products}`, dataSubmit)
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setData(response.data.data);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getListProduct();
-    }, [page, itemDisplay, searchValue, searchCategory, isDelete]);
+        getListEmployee();
+    }, [dataSubmit, searchCategory, page, isDelete]);
 
-    function ShowProducts(products) {
-        return products.map((item) => (
-            <ProductItem key={item.id} data={item} deleteProduct={() => deleteProduct(item.id, item.status)} />
-        ));
-    }
+    const showData = (data) => {
+        if (data.size > 0) {
+            const Items = [];
+            for (let i = 0; i < data.size; i++) {
+                Items.push(
+                    <ProductItem
+                        key={data.list[i].id}
+                        data={data.list[i]}
+                        deleteProduct={() => deleteProduct(data.list[i].id, data.list[i].status)}
+                    />,
+                );
+            }
+            return Items;
+        }
+    };
 
     useEffect(() => {
-        const getAllCategories = async () => {
-            const result = await CategoryService.getAllCategories();
-            setCategories(result.data);
-            return result.data;
+        const getCategories = async () => {
+            axios
+                .post(`${public_url}/${categories}`, {})
+                .then(function (response) {
+                    if (response.data.http_code == 'SUCCESS') {
+                        setDataCategories(response.data.data.list);
+                        console.log(response.data.data.list);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getAllCategories();
+        getCategories();
     }, []);
 
     const deleteProduct = (id, status) => {
@@ -47,12 +86,12 @@ function Products() {
             const deleteItem = async () => {
                 const result = await ProductService.deleteItem(id);
                 setIsDelete(true);
-                Toast('success', 'Đã xóa sản phẩm!!');
+                Toast(SUCCESS, 'Đã xóa sản phẩm!!');
             };
             deleteItem();
             setIsDelete(false);
         } else {
-            Toast('warning', 'Sản phẩm đã xóa!!');
+            Toast(WARNING, 'Sản phẩm đã xóa!!');
         }
     };
 
@@ -66,10 +105,20 @@ function Products() {
     }
 
     useEffect(() => {
-        if (searchValue) {
+        if (dataSubmit.search) {
             setPage(PAGE_ONE);
         }
-    }, [searchValue]);
+    }, [dataSubmit.search]);
+
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+        documentTitle: 'Products',
+    });
+
+    const onChange = (e) => {
+        setDataSubmit({ ...dataSubmit, [e.target.name]: e.target.value });
+    };
 
     return (
         <div className="main-panel">
@@ -100,7 +149,7 @@ function Products() {
                                                         onChange={handleChangeCategory}
                                                     >
                                                         <option value="">Tất cả</option>
-                                                        {categories.map((item) => (
+                                                        {dataCategories.map((item) => (
                                                             <option key={item.id} value={item.id}>
                                                                 {item.name}
                                                             </option>
@@ -113,12 +162,9 @@ function Products() {
                                         <div className="col-md-2 col-lg-2">
                                             <div className="form-group form-group-default">
                                                 <div className="form-group">
-                                                    <label>Số sản phẩm</label>
-                                                    <select
-                                                        className="form-control"
-                                                        onChange={(e) => setItemDisplay(e.target.value)}
-                                                    >
-                                                        <option>5</option>
+                                                    <label>Items</label>
+                                                    <select name="size" onChange={onChange} className="form-control">
+                                                        <option>{PAGE_SIZE}</option>
                                                         <option>10</option>
                                                         <option>15</option>
                                                         <option>20</option>
@@ -133,11 +179,12 @@ function Products() {
                                         <div className="col-md-6 col-lg-4">
                                             <div className="input-icon">
                                                 <input
-                                                    value={searchValue || ''}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
+                                                    name="search"
+                                                    value={dataSubmit.search || ''}
+                                                    onChange={onChange}
                                                     type="text"
                                                     className="form-control"
-                                                    placeholder="Nhập tên sản phẩm..."
+                                                    placeholder="Nhập tên..."
                                                 />
                                                 <span className="input-icon-addon">
                                                     <i className="fa fa-search" />
@@ -145,41 +192,51 @@ function Products() {
                                             </div>
                                         </div>
                                         <br />
-                                        <div className="col-md-4 col-lg-6"></div>
+                                        <div className="col-md-4 col-lg-4"></div>
+                                        <div className="col-md-2 col-lg-2">
+                                            <button
+                                                onClick={() => handlePrint()}
+                                                className="btn btn-primary btn-round ml-auto"
+                                            >
+                                                Export
+                                            </button>
+                                        </div>
                                         <br />
                                         <div className="col-md-2 col-lg-2">
-                                            <Link to={'/update-product'} style={{ color: 'white' }}>
+                                            <Link to={update_products} style={{ color: 'white' }}>
                                                 <button className="btn btn-primary btn-round ml-auto">
-                                                    <i className="fa fa-plus " /> Thêm sản phẩm
+                                                    <i className="fa fa-plus " /> Add
                                                 </button>
                                             </Link>
                                         </div>
                                     </div>
-                                    <div className="table-responsive">
-                                        <table className="display table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Image</th>
-                                                    <th>Name</th>
-                                                    <th></th>
-                                                    <th>Quantity</th>
-                                                    <th>Discount</th>
-                                                    <th>Price</th>
-                                                    <th>Status</th>
-                                                    <th>Comment</th>
-                                                    <th>Warranty</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>{ShowProducts(products)}</tbody>
-                                        </table>
+                                    <div ref={componentRef}>
+                                        <div className="table-responsive">
+                                            <table className="display table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Image</th>
+                                                        <th>Name</th>
+                                                        <th></th>
+                                                        <th>Quantity</th>
+                                                        <th>Discount</th>
+                                                        <th>Price</th>
+                                                        <th>Status</th>
+                                                        <th>Comment</th>
+                                                        <th>Warranty</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>{showData(data)}</tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {data.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={data.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

@@ -7,6 +7,8 @@ import { admin_url } from '../../services/base_url';
 import axios from 'axios';
 import * as CategoryService from '../../services/CategoryService';
 import swal from 'sweetalert';
+import { ERROR, SUCCESS, WARNING } from '../../services/constant';
+import { categories } from '../../services/link_redirect';
 function UpdateCategory() {
     let { categoryId } = useParams();
 
@@ -27,9 +29,10 @@ function UpdateCategory() {
     useEffect(() => {
         if (categoryId != null) {
             const getOne = async () => {
-                const result = await CategoryService.getOne(categoryId);
-                setData(result.data);
-                return result.data;
+                const response = await CategoryService.getOne(categoryId);
+                if (response.data.http_code == SUCCESS) {
+                    setData(response.data.data);
+                }
             };
             getOne();
         }
@@ -41,26 +44,26 @@ function UpdateCategory() {
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        const url = `${admin_url}/categories`;
+        const url = `${admin_url}/${categories}`;
         if (data.id === '') {
-            Toast('warning', 'Please enter id!');
+            Toast(WARNING, 'Please enter id!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Please enter name!');
+            Toast(WARNING, 'Please enter name!');
             return;
         } else {
             axios
                 .post(url, data)
                 .then((response) => {
-                    Toast('success', 'Successful!');
+                    Toast(SUCCESS, 'Successful!');
                     if (file) {
                         uploadFile(response.data.id);
                     }
-                    setTimeout(() => Redirect('categories'), 3000);
+                    setTimeout(() => Redirect(categories), 3000);
                 })
                 .catch((error) => {
-                    Toast('error', 'An error occurred! Please try again!');
+                    Toast(ERROR, 'An error occurred! Please try again!');
                 });
         }
     };
@@ -69,18 +72,18 @@ function UpdateCategory() {
         e.preventDefault();
         swal({
             title: 'Cancel?',
-            icon: 'warning',
+            icon: WARNING,
             buttons: true,
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                setTimeout(() => Redirect('categories'), 1000);
+                setTimeout(() => Redirect(categories), 1000);
             }
         });
     };
 
     function uploadFile(id) {
-        const url = `${admin_url}/categories/image`;
+        const url = `${admin_url}/${categories}/image`;
         const formData = new FormData();
         formData.append('id', id);
         formData.append('file', file);
@@ -96,7 +99,7 @@ function UpdateCategory() {
                 // Toast('success', 'Successfully updated!!');
             })
             .catch((error) => {
-                Toast('error', 'Something went wrong : ' + error);
+                Toast(ERROR, 'Something went wrong : ' + error);
             });
     }
 

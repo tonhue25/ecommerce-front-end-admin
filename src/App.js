@@ -18,11 +18,14 @@ import Employees from './screens/Employee/Employees';
 import UpdateEmployee from './screens/Employee/UpdateEmployee';
 import DetailImport from './screens/Import/DetailImport';
 import Imports from './screens/Import/Imports';
+import Invoice from './screens/Invoice/Invoice';
 import Login from './screens/Login';
 import DetailOrder from './screens/Order/DetailOrder';
 import Orders from './screens/Order/Orders';
 import Products from './screens/Product/Products';
 import UpdateProduct from './screens/Product/UpdateProduct';
+import DetailReturnOrder from './screens/ReturnOrder/DetailReturnOrder';
+import ReturnOrders from './screens/ReturnOrder/ReturnOrders';
 import InventoryProduct from './screens/Statistic/InventoryProduct';
 import Revenue from './screens/Statistic/Revenue';
 import TopProduct from './screens/Statistic/TopProduct';
@@ -66,6 +69,8 @@ function App() {
                     <Route path={'detail-invoices/:id'} element={<CartDetails />}></Route>
                     <Route path={'detail-shipping/:id'} element={<CartDetailsShipping />}></Route>
 
+                    <Route path={'invoice/:id'} element={<Invoice />}></Route>
+
                     <Route path={'orders'} element={<Orders />}></Route>
                     <Route path={'detail-order/:id'} element={<DetailOrder />}></Route>
                     <Route path={'detail-order'} element={<DetailOrder isReload={isReload} />}></Route>
@@ -73,6 +78,10 @@ function App() {
                     <Route path={'imports'} element={<Imports />}></Route>
                     <Route path={'detail-import'} element={<DetailImport isReload={isReload} />}></Route>
                     <Route path={'detail-import/:id'} element={<DetailImport />}></Route>
+
+                    <Route path={'return-orders'} element={<ReturnOrders />}></Route>
+                    <Route path={'detail-return-orders'} element={<DetailReturnOrder isReload={isReload} />}></Route>
+                    <Route path={'detail-return-orders/:id'} element={<DetailReturnOrder />}></Route>
 
                     <Route path={'top-products'} element={<TopProduct />}></Route>
                     <Route path={'revenue-statistics'} element={<Revenue />}></Route>

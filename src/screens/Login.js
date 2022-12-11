@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import { useState } from 'react';
 import axios from 'axios';
 import Redirect from '../utils/Redirect';
-import { admin_url } from '../services/base_url';
+import { public_url } from '../services/base_url';
 
 function Login({ setAccessToken }) {
     const [id, setId] = useState('');
@@ -19,17 +19,24 @@ function Login({ setAccessToken }) {
             Toast('warning', 'Please enter password!');
             return;
         }
-        const url = `${admin_url}/login`;
+        const url = `${public_url}/login`;
         try {
-            const response = await axios.post(url, {
-                id: id,
-                password: password,
-            });
-            localStorage.setItem('accessToken', JSON.stringify(response.data));
-            setAccessToken(localStorage.getItem('accessToken'));
-            if (response.data.departmentId == 'shipping') {
-                Redirect('my-invoices');
-            }
+            const response = await axios
+                .post(url, {
+                    email: id,
+                    password: password,
+                    role: 'EMPLOYEE',
+                })
+                .then(function (response) {
+                    if (response.data.http_code === 'SUCCESS') {
+                        localStorage.setItem('accessToken', JSON.stringify(response.data));
+                        setAccessToken(localStorage.getItem('accessToken'));
+                    }
+                })
+                .catch(function (error) {
+                    Toast('error', 'Incorrect username or password! Please try again!');
+                    return;
+                });
         } catch (err) {
             if (err.response.data.message == 'account.not.active') {
                 Toast('error', 'Inactive account!!');

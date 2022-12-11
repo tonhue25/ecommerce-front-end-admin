@@ -33,16 +33,20 @@ function EmployeeItem({ data, deleteItem }) {
                             <i className="fa fa-edit"></i>
                         </Link>
                     </button>
-                    <button
-                        onClick={() => deleteItem(data.id)}
-                        type="button"
-                        data-toggle="tooltip"
-                        title="Remove"
-                        className="btn btn-link btn-danger"
-                        data-original-title="Remove"
-                    >
-                        <i className="fa fa-times" />
-                    </button>
+                    {data.status === 'true' ? (
+                        <button
+                            onClick={() => deleteItem(data.id)}
+                            type="button"
+                            data-toggle="tooltip"
+                            title="Remove"
+                            className="btn btn-link btn-danger"
+                            data-original-title="Remove"
+                        >
+                            <i className="fa fa-times" />
+                        </button>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </td>
         </tr>

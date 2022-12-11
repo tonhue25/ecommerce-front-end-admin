@@ -13,7 +13,11 @@ export const DELIVERING = 'DELIVERING';
 export const DELIVERED = 'DELIVERED';
 export const CANCEL = 'CANCEL';
 export const COMMENTED = 'COMMENTED';
+export const SUCCESS = 'SUCCESS';
+export const WARNING = 'warning';
+export const ERROR = 'error';
 
+export const EMPLOYEE = 'EMPLOYEE';
 export function convertState(state) {
     let result = '';
     if (state == 1) {

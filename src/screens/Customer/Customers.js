@@ -1,34 +1,64 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
+import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
 import CustomerItem from './../Customer/CustomerItem';
 import * as CustomerService from '../../services/CustomerService';
 import { Pagination } from '@mui/material';
 import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
+import { admin_url } from '../../services/base_url';
+import axios from 'axios';
 function Customers() {
-    const [page, setPage] = useState(1);
-    const [customers, setCustomers] = useState([]);
-    const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
-    const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
+    const [page, setPage] = useState(PAGE_ONE);
     const [isDelete, setIsDelete] = useState(false);
+    const [data, setData] = useState([]);
+
+    const [dataSubmit, setDataSubmit] = useState({
+        size: PAGE_SIZE,
+        page: page,
+        search: '',
+    });
 
     useEffect(() => {
-        const getListCustomers = async () => {
-            const result = await CustomerService.getListCustomers(page, itemDisplay, searchValue, 'false');
-            setCustomers(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data;
+        dataSubmit.page = page;
+        const getList = async () => {
+            axios
+                .post(`${admin_url}/customers`, dataSubmit)
+                .then(function (response) {
+                    setData(response.data.data);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getListCustomers();
-    }, [page, itemDisplay, searchValue, isDelete]);
+        getList();
+    }, [dataSubmit, page, isDelete]);
 
-    function ShowCustomers(customers) {
-        return customers.map((item) => (
-            <CustomerItem key={item.cardId} data={item} deleteItem={() => deleteItem(item.cardId, item.status)} />
-        ));
-    }
+    const showData = (data) => {
+        if (data.size > 0) {
+            const Items = [];
+            for (let i = 0; i < data.size; i++) {
+                Items.push(
+                    <CustomerItem
+                        key={data.list[i].id}
+                        data={data.list[i]}
+                        deleteItem={() => deleteItem(data.list[i].id, data.list[i].status)}
+                    />,
+                );
+            }
+            return Items;
+        }
+    };
+
+    useEffect(() => {
+        if (dataSubmit.search) {
+            setPage(PAGE_ONE);
+        }
+    }, [dataSubmit.search]);
+
+    const onChange = (e) => {
+        setDataSubmit({ ...dataSubmit, [e.target.name]: e.target.value });
+    };
 
     const deleteItem = (id, status) => {
         if (status == 'true') {
@@ -71,8 +101,11 @@ function Customers() {
                                         <div className="col-md-6 col-lg-4">
                                             <div className="input-icon">
                                                 <input
-                                                    value={searchValue}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
+                                                    name="search"
+                                                    value={dataSubmit.search || ''}
+                                                    onChange={onChange}
+                                                    // value={searchValue}
+                                                    // onChange={(e) => setSearchValue(e.target.value)}
                                                     type="text"
                                                     className="form-control"
                                                     placeholder="Nhập tên..."
@@ -107,14 +140,14 @@ function Customers() {
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody>{ShowCustomers(customers)}</tbody>
+                                            <tbody>{showData(data)}</tbody>
                                         </table>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {data.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={data.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

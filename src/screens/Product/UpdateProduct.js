@@ -10,9 +10,11 @@ import { useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import Redirect from '../../utils/Redirect';
 import { CKEditor } from 'ckeditor4-react';
+import { categories } from '../../services/link_redirect';
+import { SUCCESS } from '../../services/constant';
 function UpdateProduct() {
     let { productId } = useParams();
-    const [categories, setCategories] = useState([]);
+    const [dataCategories, setDataCategories] = useState([]);
 
     const [data, setData] = useState({
         id: '',
@@ -30,7 +32,7 @@ function UpdateProduct() {
         if (productId != null) {
             const getOne = async () => {
                 const result = await ProductService.getOne(productId);
-                setData(result.data);
+                setData(result.data.data);
                 return result.data;
             };
             getOne();
@@ -50,12 +52,20 @@ function UpdateProduct() {
     };
 
     useEffect(() => {
-        const getAllCategories = async () => {
-            const result = await CategoryService.getAllCategories();
-            setCategories(result.data);
-            return result.data;
+        const getCategories = async () => {
+            axios
+                .post(`${public_url}/${categories}`, {})
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setDataCategories(response.data.data.list);
+                        console.log(response.data.data.list);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getAllCategories();
+        getCategories();
     }, []);
 
     const handleUpdate = (e) => {
@@ -202,7 +212,7 @@ function UpdateProduct() {
                                                         name="categoryId"
                                                         onChange={onChange}
                                                     >
-                                                        {categories.map((item) => (
+                                                        {dataCategories.map((item) => (
                                                             <option
                                                                 key={item.id}
                                                                 value={item.id}
@@ -348,34 +358,6 @@ function UpdateProduct() {
                                                 value={data.description || ''}
                                             />
                                         </div>
-                                        {/* <div className="form-group">
-                                            <label htmlFor="description">Mô tả sản phẩm</label>
-                                            <CKEditor
-                                                editorUrl="https://your-website.example/ckeditor/ckeditor.js"
-                                                initData={data.description}
-                                                name="description"
-                                                onNamespaceLoaded={(CKEDITOR) => {
-                                                    // Handles `namespaceLoaded` event which is fired once the CKEDITOR namespace is loaded.
-                                                    // This event is emitted only once.
-                                                }}
-                                                onBeforeLoad={(CKEDITOR) => {
-                                                    // Handles `beforeLoad` event which is fired before an editor instance is created.
-                                                }}
-                                                onInstanceReady={({ editor }) => {
-                                                    // Handles native `instanceReady` event.
-                                                }}
-                                                onFocus={({ editor }) => {
-                                                    // Handles native `focus` event.
-                                                }}
-                                                onCustomEvent={({ editor }) => {
-                                                    // Handles custom `customEvent` event.
-                                                }}
-                                                onChange={onChange}
-                                                readOnly={false}
-                                                style={{ borderColor: 'blue' }}
-                                                type="classic"
-                                            />
-                                        </div> */}
                                     </div>
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>

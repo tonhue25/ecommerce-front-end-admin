@@ -93,16 +93,20 @@ function ProductItem({ data, deleteProduct }) {
                             <i className="fa fa-edit"></i>
                         </button>
                     </Link>
-                    <button
-                        onClick={() => deleteProduct(data.id)}
-                        type="button"
-                        data-toggle="tooltip"
-                        title="Remove"
-                        className="btn btn-link btn-danger"
-                        data-original-title="Remove"
-                    >
-                        <i className="fa fa-times" />
-                    </button>
+                    {data.status === 'true' ? (
+                        <button
+                            onClick={() => deleteProduct(data.id)}
+                            type="button"
+                            data-toggle="tooltip"
+                            title="Remove"
+                            className="btn btn-link btn-danger"
+                            data-original-title="Remove"
+                        >
+                            <i className="fa fa-times" />
+                        </button>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </td>
         </tr>

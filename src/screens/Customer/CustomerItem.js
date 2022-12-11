@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 function CustomerItem({ data, deleteItem }) {
     return (
         <tr>
-            <td>{data.cardId}</td>
+            <td>{data.id}</td>
             <td>{data.name}</td>
             <td>{data.email}</td>
             <td>{data.phoneNumber}</td>
@@ -26,20 +26,24 @@ function CustomerItem({ data, deleteItem }) {
                         className="btn btn-link btn-primary btn-lg"
                         data-original-title="Edit Task"
                     >
-                        <Link to={'/update-customer/' + data.cardId}>
+                        <Link to={'/update-customer/' + data.id}>
                             <i className="fa fa-edit"></i>
                         </Link>
                     </button>
-                    <button
-                        onClick={() => deleteItem(data.id)}
-                        type="button"
-                        data-toggle="tooltip"
-                        title="Remove"
-                        className="btn btn-link btn-danger"
-                        data-original-title="Remove"
-                    >
-                        <i className="fa fa-times" />
-                    </button>
+                    {data.status === 'true' ? (
+                        <button
+                            onClick={() => deleteItem(data.id)}
+                            type="button"
+                            data-toggle="tooltip"
+                            title="Remove"
+                            className="btn btn-link btn-danger"
+                            data-original-title="Remove"
+                        >
+                            <i className="fa fa-times" />
+                        </button>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </td>
         </tr>
