@@ -5,7 +5,7 @@ import { PAGE_SIZE, PAGE_ONE, SUCCESS, WARNING } from '../../services/constant';
 import ProductItem from './ProductItem';
 import * as CategoryService from '../../services/CategoryService';
 import { Pagination } from '@mui/material';
-import Toast from '../../utils/Toast';
+import Toast, { success, toast_success, toast_warning, warning } from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
 
 import { useReactToPrint } from 'react-to-print';
@@ -69,9 +69,8 @@ function Products() {
             axios
                 .post(`${public_url}/${categories}`, {})
                 .then(function (response) {
-                    if (response.data.http_code == 'SUCCESS') {
+                    if (response.data.http_code == SUCCESS) {
                         setDataCategories(response.data.data.list);
-                        console.log(response.data.data.list);
                     }
                 })
                 .catch(function (error) {
@@ -86,12 +85,14 @@ function Products() {
             const deleteItem = async () => {
                 const result = await ProductService.deleteItem(id);
                 setIsDelete(true);
-                Toast(SUCCESS, 'Đã xóa sản phẩm!!');
+                if (result.data.http_code == SUCCESS) {
+                    Toast(toast_success, 'Đã xóa sản phẩm!!');
+                }
             };
             deleteItem();
             setIsDelete(false);
         } else {
-            Toast(WARNING, 'Sản phẩm đã xóa!!');
+            Toast(toast_warning, 'Sản phẩm đã xóa!!');
         }
     };
 

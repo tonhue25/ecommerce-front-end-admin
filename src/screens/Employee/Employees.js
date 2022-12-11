@@ -1,15 +1,15 @@
+import { Pagination } from '@mui/material';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PAGE_ONE, PAGE_SIZE, SUCCESS, WARNING } from '../../services/constant';
-import EmployeeItem from './../Employee/EmployeeItem';
-import * as EmployeeService from '../../services/EmployeeService';
-import { Pagination } from '@mui/material';
-import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
-import * as DepartmentService from '../../services/DepartmentService';
-import axios from 'axios';
 import { admin_url } from '../../services/base_url';
+import { PAGE_ONE, PAGE_SIZE, SUCCESS, WARNING } from '../../services/constant';
+import * as DepartmentService from '../../services/DepartmentService';
+import * as EmployeeService from '../../services/EmployeeService';
 import { employees, update_employees } from '../../services/link_redirect';
+import Toast, { toast_success, toast_warning } from '../../utils/Toast';
+import EmployeeItem from './../Employee/EmployeeItem';
 function Employees() {
     const [page, setPage] = useState(PAGE_ONE);
     const [departments, setDepartments] = useState([]);
@@ -57,13 +57,13 @@ function Employees() {
 
     const deleteItem = (id, status) => {
         if (id == JSON.parse(localStorage.getItem('accessToken')).data.account.id) {
-            Toast(WARNING, 'not authorized to delete!!');
+            Toast(toast_warning, 'not authorized to delete!!');
         }
         if (status == 'true' && !(id == JSON.parse(localStorage.getItem('accessToken')).data.account.id)) {
             const deleteItem = async () => {
                 const result = await EmployeeService.deleteItem(id);
                 setIsDelete(true);
-                Toast(SUCCESS, 'deleted!!');
+                Toast(toast_success, 'deleted!!');
             };
             deleteItem();
             setIsDelete(false);

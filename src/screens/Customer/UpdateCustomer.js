@@ -1,15 +1,16 @@
-import { ToastContainer } from 'react-toastify';
-import { useState, useEffect } from 'react';
-import { admin_url, public_url } from '../../services/base_url';
 import axios from 'axios';
-import Toast from '../../utils/Toast';
-import Redirect from '../../utils/Redirect';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import * as CustomerService from '../../services/CustomerService';
+import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
+import { user_url } from '../../services/base_url';
+import * as CustomerService from '../../services/CustomerService';
+import { customers } from '../../services/link_redirect';
+import Redirect from '../../utils/Redirect';
+import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
+import { CUSTOMER, SUCCESS } from '../../services/constant';
 function UpdateCustomer() {
     let { customerId } = useParams();
-
     const [data, setData] = useState({
         id: '',
         email: '',
@@ -18,7 +19,7 @@ function UpdateCustomer() {
         phoneNumber: '',
         taxCode: '',
         accountId: '',
-        roleId: 'CUSTOMER',
+        roleId: CUSTOMER,
         status: 'true',
         password: '',
     });
@@ -48,42 +49,39 @@ function UpdateCustomer() {
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        data.roleId = 'customer';
+        data.roleId = CUSTOMER;
         data.password = '';
-        console.log(data);
-        const url = `${public_url}/customers`;
-        if (data.cardId === '') {
-            Toast('warning', 'Vui lòng nhập chứng minh nhân dân!');
+        const url = `${user_url}/${customers}`;
+        if (data.id === '') {
+            Toast(toast_warning, 'Vui lòng nhập chứng minh nhân dân!');
             return;
         }
         if (data.email === '') {
-            Toast('warning', 'Vui lòng nhập email!');
+            Toast(toast_warning, 'Vui lòng nhập email!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Vui lòng nhập tên!');
+            Toast(toast_warning, 'Vui lòng nhập tên!');
             return;
         }
         if (data.address === '') {
-            Toast('warning', 'Vui lòng nhập địa chỉ!');
+            Toast(toast_warning, 'Vui lòng nhập địa chỉ!');
             return;
         }
         if (data.phoneNumber === '') {
-            Toast('warning', 'Vui lòng nhập số điện thoại!');
+            Toast(toast_warning, 'Vui lòng nhập số điện thoại!');
             return;
         } else {
             axios
-                .post(url, data)
+                .put(url, data)
                 .then((response) => {
-                    if (isUpdate) {
-                        Toast('success', 'Chỉnh sửa thành công!');
-                    } else {
-                        Toast('success', 'Thêm mới thành công!');
+                    if (response.data.http_code == SUCCESS) {
+                        Toast(toast_success, 'success!');
+                        setTimeout(() => Redirect(`/${customers}`), 3000);
                     }
-                    setTimeout(() => Redirect('customers'), 3000);
                 })
                 .catch((error) => {
-                    Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                    Toast(toast_error, 'opps!');
                 });
         }
     };
@@ -97,7 +95,7 @@ function UpdateCustomer() {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                setTimeout(() => Redirect('customers'), 1000);
+                setTimeout(() => Redirect(`/${customers}`), 3000);
             }
         });
     };

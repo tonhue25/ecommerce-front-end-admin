@@ -1,4 +1,4 @@
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const Toast = (type, message) =>
     toast[type](message, {
@@ -9,3 +9,7 @@ const Toast = (type, message) =>
     });
 
 export default Toast;
+
+export const toast_warning = 'warning';
+export const toast_success = 'success';
+export const toast_error = 'error';

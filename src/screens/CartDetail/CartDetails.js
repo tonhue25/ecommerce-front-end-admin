@@ -1,65 +1,45 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
-import * as CartDetailService from '../../services/CartDetailService';
-import * as EmployeeService from '../../services/EmployeeService';
-import * as CartService from '../../services/CartService';
 import axios from 'axios';
-import * as constant from '../../services/constant';
-import { admin_url } from '../../services/base_url';
+import { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
+import { useParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { admin_url } from '../../services/base_url';
+import * as constant from '../../services/constant';
 import Redirect from '../../utils/Redirect';
 import Toast from '../../utils/Toast';
-import { ToastContainer } from 'react-toastify';
 
-import { useReactToPrint } from 'react-to-print';
-import { useRef } from 'react';
 import Moment from 'moment';
-import * as InvoiceService from '../../services/InvoiceService';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
+import * as InvoiceService from '../../services/InvoiceService';
+import { employees, list } from '../../services/link_redirect';
 function CartDetails() {
     let { id } = useParams();
-
-    const [employees, setEmployees] = useState([]);
+    const [dataEmployees, setDataEmployees] = useState([]);
     const [states, setStates] = useState();
     const [isUpdate, setIsUpdate] = useState(false);
     const [cart, setCart] = useState();
     const [searchState, setSearchState] = useState();
-    // useEffect(() => {
-    //     const getOne = async () => {
-    //         const result = await CartService.getOne(id);
-    //         setCart(result.data);
-    //         return result.data.deliveryId;
-    //     };
-    //     getOne();
-    // }, []),
 
     const [dataCartDetails, setDataCartDetails] = useState();
-    useEffect(() => {
-        const getDetailCart = async () => {
-            const result = await CartDetailService.getDetailCart(id);
-            setDataCartDetails(result.data);
-            return result.data;
-        };
-        getDetailCart();
-    }, [isUpdate]);
 
     useEffect(() => {
-        const getOne = async () => {
-            const result = await CartService.getOne(id);
-            setCart(result.data);
-            return result.data;
+        const getEmployees = async () => {
+            axios
+                .post(`${admin_url}/${employees}/${list}`, {
+                    departmentId: [constant.shipping],
+                })
+                .then(function (response) {
+                    if (response.data.http_code == constant.SUCCESS) {
+                        setDataEmployees(response.data.data.list);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getOne();
-    }, []);
-
-    useEffect(() => {
-        const getAllEmployeeByDepartment = async () => {
-            const result = await EmployeeService.getAllEmployeeByDepartment('shipping');
-            setEmployees(result.data);
-            return result.data;
-        };
-        getAllEmployeeByDepartment();
+        getEmployees();
     }, []);
 
     const handleConfirm = (cartId, status) => {
@@ -154,27 +134,26 @@ function CartDetails() {
                                     <div className="d-flex align-items-center">
                                         <div className="col-md-6 col-lg-4">
                                             <div className="form-group form-group-default">
-                                                {cart ? (
-                                                    <div className="form-group">
-                                                        <label>Nhân viên giao hàng</label>
-                                                        <select
-                                                            className="form-control form-control"
-                                                            onChange={handleChangeState}
-                                                        >
-                                                            {employees.map((item) => (
-                                                                <option
-                                                                    key={item.id}
-                                                                    value={item.id}
-                                                                    selected={item.id === cart.deliveryId}
-                                                                >
-                                                                    {item.id + ' - ' + item.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                ) : (
-                                                    <></>
-                                                )}
+                                                {/* {cart ? ( */}
+                                                <div className="form-group">
+                                                    <label>Nhân viên giao hàng</label>
+                                                    <select
+                                                        className="form-control form-control"
+                                                        onChange={handleChangeState}
+                                                    >
+                                                        {dataEmployees.map((item) => (
+                                                            <option
+                                                                key={item.id}
+                                                                value={item.id}
+                                                                // selected={item.id === cart.deliveryId}
+                                                            >
+                                                                {item.id + ' - ' + item.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                {/* ) : (<></> */}
+                                                {/* )} */}
                                             </div>
                                         </div>
                                         <div className="col-md-4 col-lg-6"></div>

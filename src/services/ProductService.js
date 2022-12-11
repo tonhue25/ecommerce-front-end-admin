@@ -24,7 +24,11 @@ export const deleteItem = async (id) => {
 };
 
 export const getPoint = async (productId) => {
-    const res = await request_public.get(`/comments/points/${productId}`);
+    const res = await request_public.get('/comments/points', {
+        params: {
+            productId,
+        },
+    });
     return res;
 };
 

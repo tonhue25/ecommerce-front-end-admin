@@ -1,4 +1,17 @@
 import { Link } from 'react-router-dom';
+import {
+    carts,
+    categories,
+    customers,
+    discounts,
+    employees,
+    imports,
+    inventory_product,
+    orders,
+    return_orders,
+    revenue_statistics,
+    top_products,
+} from '../services/link_redirect';
 function Sidebar() {
     return (
         <div className="sidebar sidebar-style-2">
@@ -28,32 +41,32 @@ function Sidebar() {
                             </li>
 
                             <li className="nav-item">
-                                <Link to={'/categories'}>
+                                <Link to={categories}>
                                     <p>Category</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/discounts'}>
+                                <Link to={discounts}>
                                     <p>Discount</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/employees'}>
+                                <Link to={employees}>
                                     <p>Employee</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/customers'}>
+                                <Link to={customers}>
                                     <p>Customer</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/invoices'}>
+                                <Link to={carts}>
                                     <p>Customer Order</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/return-orders'}>
+                                <Link to={return_orders}>
                                     <p>Return Order</p>
                                 </Link>
                             </li>
@@ -66,17 +79,17 @@ function Sidebar() {
                                 <div className="collapse" id="tables">
                                     <ul className="nav nav-collapse">
                                         <li>
-                                            <Link to={'/top-products'}>
+                                            <Link to={top_products}>
                                                 <p>Best seller</p>
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link to={'/revenue-statistics'}>
+                                            <Link to={revenue_statistics}>
                                                 <p>Revenue</p>
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link to={'/inventory-product'}>
+                                            <Link to={inventory_product}>
                                                 <p>Inventory</p>
                                             </Link>
                                         </li>
@@ -84,12 +97,12 @@ function Sidebar() {
                                 </div>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/orders'}>
+                                <Link to={orders}>
                                     <p>Supplier Order</p>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link to={'/imports'}>
+                                <Link to={imports}>
                                     <p>Import</p>
                                 </Link>
                             </li>

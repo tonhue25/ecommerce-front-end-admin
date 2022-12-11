@@ -4,12 +4,17 @@ import * as ProductService from '../../services/ProductService';
 import * as DiscountDetailService from '../../services/DiscountDetailService';
 import { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
+import { comments, update_products, warranty } from '../../services/link_redirect';
+import { SUCCESS, ZERO } from '../../services/constant';
 function ProductItem({ data, deleteProduct }) {
-    const [point, setPoint] = useState(0);
+    // get point
+    const [point, setPoint] = useState(ZERO);
     useEffect(() => {
         const fetchApiGetPoint = async () => {
             const result = await ProductService.getPoint(data.id);
-            setPoint(result.data);
+            if (result.data.http_code == SUCCESS) {
+                setPoint(result.data.data);
+            }
             return result.data;
         };
         fetchApiGetPoint();
@@ -60,7 +65,7 @@ function ProductItem({ data, deleteProduct }) {
                 </button>
             </td>
             <td style={{ width: '5%', justifyContent: 'center' }}>
-                <Link to={`/comments/${data.id}`}>
+                <Link to={`/${comments}/${data.id}`}>
                     <button
                         type="button"
                         data-toggle="tooltip"
@@ -74,7 +79,7 @@ function ProductItem({ data, deleteProduct }) {
             </td>
 
             <td style={{ width: '5%', justifyContent: 'center' }}>
-                <Link to={`/warranty/${data.id}`}>
+                <Link to={`/${warranty}/${data.id}`}>
                     <button type="button" className="btn btn-link btn-primary btn-lg">
                         <i class="fa fa-lock" aria-hidden="true"></i>
                     </button>
@@ -82,7 +87,7 @@ function ProductItem({ data, deleteProduct }) {
             </td>
             <td style={{ width: '5%', justifyContent: 'center' }}>
                 <div className="form-button-action">
-                    <Link to={'/update-product/' + data.id}>
+                    <Link to={`/${update_products}/${data.id}`}>
                         <button
                             type="button"
                             data-toggle="tooltip"

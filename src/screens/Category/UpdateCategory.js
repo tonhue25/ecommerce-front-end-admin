@@ -1,14 +1,14 @@
-import Toast from '../../utils/Toast';
-import { ToastContainer } from 'react-toastify';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Redirect from '../../utils/Redirect';
-import { admin_url } from '../../services/base_url';
-import axios from 'axios';
-import * as CategoryService from '../../services/CategoryService';
+import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
-import { ERROR, SUCCESS, WARNING } from '../../services/constant';
+import { admin_url } from '../../services/base_url';
+import * as CategoryService from '../../services/CategoryService';
+import { SUCCESS } from '../../services/constant';
 import { categories } from '../../services/link_redirect';
+import Redirect from '../../utils/Redirect';
+import Toast, { toast_error, toast_warning } from '../../utils/Toast';
 function UpdateCategory() {
     let { categoryId } = useParams();
 
@@ -46,11 +46,11 @@ function UpdateCategory() {
         e.preventDefault();
         const url = `${admin_url}/${categories}`;
         if (data.id === '') {
-            Toast(WARNING, 'Please enter id!');
+            Toast(toast_warning, 'Please enter id!');
             return;
         }
         if (data.name === '') {
-            Toast(WARNING, 'Please enter name!');
+            Toast(toast_warning, 'Please enter name!');
             return;
         } else {
             axios
@@ -62,8 +62,8 @@ function UpdateCategory() {
                     }
                     setTimeout(() => Redirect(categories), 3000);
                 })
-                .catch((error) => {
-                    Toast(ERROR, 'An error occurred! Please try again!');
+                .catch((e) => {
+                    Toast(toast_error, 'An error occurred! Please try again!');
                 });
         }
     };
@@ -72,7 +72,7 @@ function UpdateCategory() {
         e.preventDefault();
         swal({
             title: 'Cancel?',
-            icon: WARNING,
+            icon: toast_warning,
             buttons: true,
             dangerMode: true,
         }).then((willDelete) => {
@@ -98,8 +98,8 @@ function UpdateCategory() {
             .then((response) => {
                 // Toast('success', 'Successfully updated!!');
             })
-            .catch((error) => {
-                Toast(ERROR, 'Something went wrong : ' + error);
+            .catch((e) => {
+                Toast(toast_error, 'Something went wrong : ' + e);
             });
     }
 

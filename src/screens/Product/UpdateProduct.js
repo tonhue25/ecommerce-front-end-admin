@@ -1,17 +1,15 @@
-import { ToastContainer } from 'react-toastify';
-import { useState, useEffect, useLayoutEffect } from 'react';
-import * as CategoryService from '../../services/CategoryService';
-import * as ProductService from '../../services/ProductService';
-import { admin_url, public_url } from '../../services/base_url';
 import axios from 'axios';
-import Toast from '../../utils/Toast';
+import { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import { admin_url, public_url } from '../../services/base_url';
+import * as ProductService from '../../services/ProductService';
+import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
 
 import { useParams } from 'react-router-dom';
 import swal from 'sweetalert';
-import Redirect from '../../utils/Redirect';
-import { CKEditor } from 'ckeditor4-react';
-import { categories } from '../../services/link_redirect';
 import { SUCCESS } from '../../services/constant';
+import { categories } from '../../services/link_redirect';
+import Redirect from '../../utils/Redirect';
 function UpdateProduct() {
     let { productId } = useParams();
     const [dataCategories, setDataCategories] = useState([]);
@@ -58,7 +56,6 @@ function UpdateProduct() {
                 .then(function (response) {
                     if (response.data.http_code == SUCCESS) {
                         setDataCategories(response.data.data.list);
-                        console.log(response.data.data.list);
                     }
                 })
                 .catch(function (error) {
@@ -72,32 +69,33 @@ function UpdateProduct() {
         e.preventDefault();
         const url = `${admin_url}/products`;
         if (data.id === '') {
-            Toast('warning', 'Please enter id!');
+            Toast(toast_warning, 'Please enter id!');
             return;
         }
         if (data.name === '') {
-            Toast('warning', 'Please enter name!');
+            Toast(toast_warning, 'Please enter name!');
             return;
         }
         if (data.price === '') {
-            Toast('warning', 'Please enter price!');
+            Toast(toast_warning, 'Please enter price!');
             return;
         }
         if (data.inventoryNumber === '') {
-            Toast('warning', 'Please enter inventoryNumber!');
+            Toast(toast_warning, 'Please enter inventoryNumber!');
             return;
         } else {
             axios
                 .post(url, data)
                 .then((response) => {
-                    Toast('success', 'Successful!');
-                    if (file) {
-                        uploadFile(response.data.id);
+                    if (response.data.http_code == SUCCESS) {
+                        if (file) {
+                            uploadFile(response.data.id);
+                        }
+                        setTimeout(() => Redirect(''), 5000);
                     }
-                    setTimeout(() => Redirect(''), 5000);
                 })
-                .catch((error) => {
-                    Toast('error', 'An error occurred! Please try again!');
+                .catch((e) => {
+                    Toast(toast_error, 'An error occurred! Please try again!');
                 });
         }
     };
@@ -119,7 +117,7 @@ function UpdateProduct() {
                 // Toast('success', 'Successfully updated!!');
             })
             .catch((error) => {
-                Toast('error', 'Something went wrong : ' + error);
+                Toast(toast_error, 'Something went wrong : ' + error);
             });
     }
 
@@ -127,7 +125,7 @@ function UpdateProduct() {
         e.preventDefault();
         swal({
             title: 'Hủy chỉnh sửa?',
-            icon: 'warning',
+            icon: toast_warning,
             buttons: true,
             dangerMode: true,
         }).then((willDelete) => {

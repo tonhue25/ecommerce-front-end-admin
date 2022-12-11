@@ -1,40 +1,54 @@
+import { Pagination } from '@mui/material';
+import axios from 'axios';
+import Moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PAGE_ONE, PAGE_SIZE } from '../../services/constant';
+import { user_url } from '../../services/base_url';
+import { CANCEL, DELIVERED, DELIVERING, PAGE_ONE, SUCCESS, WAIT } from '../../services/constant';
+import { carts, detail_cart, list } from '../../services/link_redirect';
 import * as StateService from '../../services/StateService';
-import * as CartService from '../../services/CartService';
-import { Pagination } from '@mui/material';
-import Moment from 'moment';
 function Carts() {
     const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
-    const [searchState, setSearchState] = useState('');
-    const [searchCustomer, setSearchCustomer] = useState('');
-    const [carts, setCarts] = useState([]);
+    const [searchState, setSearchState] = useState([]);
+    const [dataCarts, setDataCarts] = useState([]);
     const [states, setStates] = useState({});
 
     useEffect(() => {
-        const getAllStates = async () => {
-            const result = await StateService.getAllStates();
-            setStates(result.data);
-            return result.data;
+        const getStates = async () => {
+            const response = await StateService.getAllStates();
+            if (response.data.http_code == SUCCESS) {
+                setStates(response.data.data);
+            }
         };
-        getAllStates();
+        getStates();
     }, []);
 
     const handleChangeState = (e) => {
         setSearchState(e.target.value);
     };
 
+    const [dataSubmitCart, setDataSubmitCart] = useState({
+        states: [],
+    });
+
+    const [cart, setCart] = useState([]);
     useEffect(() => {
-        const getAllCarts = async () => {
-            const result = await CartService.getAllCarts(page, PAGE_SIZE, searchState, searchCustomer);
-            setCarts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data.list;
-        };
-        getAllCarts();
-    }, [searchState, page]);
+        dataSubmitCart.states = [searchState];
+        if (searchState.length == 0) {
+            dataSubmitCart.states = [WAIT, DELIVERING, DELIVERED, CANCEL];
+        }
+        axios
+            .post(`${user_url}/${carts}/${list}`, dataSubmitCart)
+            .then(function (response) {
+                if (response.data.http_code == SUCCESS) {
+                    setDataCarts(response.data.data.list);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }, [dataSubmitCart, searchState]);
 
     const showState = () => {
         const Items = [];
@@ -110,7 +124,7 @@ function Carts() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {carts.map((item) => (
+                                                {dataCarts.map((item) => (
                                                     <tr key={item.id}>
                                                         <td style={{ width: '10px' }}>{item.id}</td>
                                                         <td>{item.customerName}</td>
@@ -146,7 +160,7 @@ function Carts() {
                                                                 title="View"
                                                                 className="btn btn-link btn-primary btn-lg"
                                                             >
-                                                                <Link to={`/detail-invoices/${item.id}`}>
+                                                                <Link to={`${detail_cart}/${item.id}`}>
                                                                     <i className="fa fa-eye"></i>
                                                                 </Link>
                                                             </button>

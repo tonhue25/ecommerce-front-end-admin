@@ -8,6 +8,7 @@ import Toast from '../../utils/Toast';
 import { ToastContainer } from 'react-toastify';
 import { admin_url } from '../../services/base_url';
 import axios from 'axios';
+import { customers } from '../../services/link_redirect';
 function Customers() {
     const [page, setPage] = useState(PAGE_ONE);
     const [isDelete, setIsDelete] = useState(false);
@@ -23,7 +24,7 @@ function Customers() {
         dataSubmit.page = page;
         const getList = async () => {
             axios
-                .post(`${admin_url}/customers`, dataSubmit)
+                .post(`${admin_url}/${customers}`, dataSubmit)
                 .then(function (response) {
                     setData(response.data.data);
                 })

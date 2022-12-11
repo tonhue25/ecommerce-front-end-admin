@@ -30,6 +30,23 @@ import InventoryProduct from './screens/Statistic/InventoryProduct';
 import Revenue from './screens/Statistic/Revenue';
 import TopProduct from './screens/Statistic/TopProduct';
 import Warranty from './screens/Warranty/Warranty';
+import {
+    carts,
+    categories,
+    comments,
+    customers,
+    detail_cart,
+    employees,
+    inventory_product,
+    login,
+    orders,
+    revenue_statistics,
+    top_products,
+    update_categories,
+    update_customer,
+    update_employees,
+    update_products,
+} from './services/link_redirect';
 import ExportPDF from './utils/ExportPDF';
 
 function App() {
@@ -45,33 +62,33 @@ function App() {
             <Header accessToken={accessToken} setAccessToken={setAccessToken} />
             <Routes>
                 <Route path={'/'} element={<Layout />}>
-                    <Route path={'login'} element={<Login setAccessToken={setAccessToken} />}></Route>
+                    <Route path={login} element={<Login setAccessToken={setAccessToken} />}></Route>
 
                     <Route path={''} element={<Products />}></Route>
-                    <Route path={'update-product'} element={<UpdateProduct />}></Route>
-                    <Route path={'update-product/:productId'} element={<UpdateProduct />}></Route>
+                    <Route path={update_products} element={<UpdateProduct />}></Route>
+                    <Route path={`${update_products}/:productId`} element={<UpdateProduct />}></Route>
 
-                    <Route path={'comments/:productId'} element={<Comments />}></Route>
+                    <Route path={`${comments}/:productId`} element={<Comments />}></Route>
 
-                    <Route path={'categories'} element={<Categories />}></Route>
-                    <Route path={'update-category'} element={<UpdateCategory />}></Route>
-                    <Route path={'update-category/:categoryId'} element={<UpdateCategory />}></Route>
+                    <Route path={categories} element={<Categories />}></Route>
+                    <Route path={update_categories} element={<UpdateCategory />}></Route>
+                    <Route path={`${update_categories}/:categoryId`} element={<UpdateCategory />}></Route>
 
-                    <Route path={'employees'} element={<Employees />}></Route>
-                    <Route path={'update-employee'} element={<UpdateEmployee />}></Route>
-                    <Route path={'update-employee/:employeeId'} element={<UpdateEmployee />}></Route>
+                    <Route path={employees} element={<Employees />}></Route>
+                    <Route path={update_employees} element={<UpdateEmployee />}></Route>
+                    <Route path={`${update_employees}/:employeeId`} element={<UpdateEmployee />}></Route>
 
-                    <Route path={'customers'} element={<Customers />}></Route>
-                    <Route path={'update-customer'} element={<UpdateCustomer />}></Route>
-                    <Route path={'update-customer/:customerId'} element={<UpdateCustomer />}></Route>
+                    <Route path={customers} element={<Customers />}></Route>
+                    <Route path={update_customer} element={<UpdateCustomer />}></Route>
+                    <Route path={`${update_customer}/:customerId`} element={<UpdateCustomer />}></Route>
 
-                    <Route path={'invoices'} element={<Carts />}></Route>
-                    <Route path={'detail-invoices/:id'} element={<CartDetails />}></Route>
+                    <Route path={carts} element={<Carts />}></Route>
+                    <Route path={`${detail_cart}/:id`} element={<CartDetails />}></Route>
                     <Route path={'detail-shipping/:id'} element={<CartDetailsShipping />}></Route>
 
                     <Route path={'invoice/:id'} element={<Invoice />}></Route>
 
-                    <Route path={'orders'} element={<Orders />}></Route>
+                    <Route path={orders} element={<Orders />}></Route>
                     <Route path={'detail-order/:id'} element={<DetailOrder />}></Route>
                     <Route path={'detail-order'} element={<DetailOrder isReload={isReload} />}></Route>
 
@@ -83,9 +100,9 @@ function App() {
                     <Route path={'detail-return-orders'} element={<DetailReturnOrder isReload={isReload} />}></Route>
                     <Route path={'detail-return-orders/:id'} element={<DetailReturnOrder />}></Route>
 
-                    <Route path={'top-products'} element={<TopProduct />}></Route>
-                    <Route path={'revenue-statistics'} element={<Revenue />}></Route>
-                    <Route path={'inventory-product'} element={<InventoryProduct />}></Route>
+                    <Route path={top_products} element={<TopProduct />}></Route>
+                    <Route path={revenue_statistics} element={<Revenue />}></Route>
+                    <Route path={inventory_product} element={<InventoryProduct />}></Route>
 
                     <Route path={'export-revenue'} element={<ExportPDF />}></Route>
 

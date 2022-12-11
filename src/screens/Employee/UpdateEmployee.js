@@ -4,12 +4,12 @@ import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import { admin_url } from '../../services/base_url';
-import { EMPLOYEE, ERROR, SUCCESS, WARNING } from '../../services/constant';
+import { EMPLOYEE, SUCCESS } from '../../services/constant';
 import * as DepartmentService from '../../services/DepartmentService';
 import * as EmployeeService from '../../services/EmployeeService';
 import { employees } from '../../services/link_redirect';
 import Redirect from '../../utils/Redirect';
-import Toast from '../../utils/Toast';
+import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
 function UpdateEmployee() {
     let { employeeId } = useParams();
     const [departments, setDepartments] = useState([]);
@@ -61,51 +61,38 @@ function UpdateEmployee() {
         e.preventDefault();
         data.roleId = EMPLOYEE;
         if (data.id === '') {
-            Toast(WARNING, 'Please enter id!');
+            Toast(toast_warning, 'Please enter id!');
             return;
         }
         if (data.email === '') {
-            Toast(WARNING, 'Please enter email!');
+            Toast(toast_warning, 'Please enter email!');
             return;
         }
         if (data.name === '') {
-            Toast(WARNING, 'Please enter name!');
+            Toast(toast_warning, 'Please enter name!');
             return;
         }
         if (data.birthday === '') {
-            Toast(WARNING, 'Please enter birthday!');
+            Toast(toast_warning, 'Please enter birthday!');
             return;
         }
         if (data.address === '') {
-            Toast(WARNING, 'Please enter address!');
+            Toast(toast_warning, 'Please enter address!');
             return;
         }
         if (data.salary === '') {
-            Toast(WARNING, 'Please enter salary!');
+            Toast(toast_warning, 'Please enter salary!');
             return;
         } else {
-            const url = `${admin_url}${employees}`;
-            console.log(url);
-            console.log(data);
+            const url = `${admin_url}/${employees}`;
             axios
-                .post(url, {
-                    id: 'confirm002',
-                    email: 'huynguyen@gmail.com',
-                    name: 'Huy Nguyễn',
-                    birthday: '2000-12-24',
-                    address: 'Thủ Đức',
-                    salary: 12000000,
-                    departmentId: 'confirm',
-                    status: 1,
-                    roleId: 'EMPLOYEE',
-                })
+                .post(url, data)
                 .then((response) => {
-                    Toast(SUCCESS, 'Successful!');
-                    setTimeout(() => Redirect(employees), 3000);
+                    Toast(toast_success, 'Successful!');
+                    setTimeout(() => Redirect(`/${employees}`), 3000);
                 })
                 .catch((error) => {
-                    console.log(error);
-                    Toast(ERROR, 'An error occurred! Please try again!');
+                    Toast(toast_error, 'An error occurred! Please try again!');
                 });
         }
     };
@@ -114,12 +101,12 @@ function UpdateEmployee() {
         e.preventDefault();
         swal({
             title: 'Cancel?',
-            icon: 'warning',
+            icon: toast_warning,
             buttons: true,
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                setTimeout(() => Redirect(employees), 1000);
+                setTimeout(() => Redirect(`/${employees}`), 1000);
             }
         });
     };
