@@ -1,29 +1,88 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PAGE_SIZE, PAGE_ONE } from '../../services/constant';
+import { PAGE_SIZE, PAGE_ONE, SUCCESS } from '../../services/constant';
 import * as DiscountService from '../../services/DiscountService';
 import { Pagination } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import Moment from 'moment';
+import axios from 'axios';
 function Discount() {
     const [page, setPage] = useState(PAGE_ONE);
     const [discounts, setDiscounts] = useState([]);
     const [totalPages, setTotalPages] = useState();
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
 
+    // useEffect(() => {
+    //     const getList = async () => {
+    //         const result = await DiscountService.getList(page, itemDisplay);
+    //         setDiscounts(result.data.list);
+    //         setTotalPages(result.data.totalPages);
+    //         return result.data.list;
+    //     };
+    //     getList();
+    // }, []);
+    const [dataSubmit, setDataSubmit] = useState({
+        size: PAGE_SIZE,
+        page: page,
+        employeeConfirm: '',
+    });
     useEffect(() => {
+        dataSubmit.page = page;
         const getList = async () => {
-            const result = await DiscountService.getList(page, itemDisplay);
-            setDiscounts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data.list;
+            axios
+                .post(`http://localhost:8080/api/admin/discounts/list`, dataSubmit)
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setDiscounts(response.data.data);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
         getList();
-    }, []);
+    }, [dataSubmit, page]);
 
     function handleChange(page) {
         setPage(page);
     }
+
+    const showData = (data) => {
+        if (data.size > 0) {
+            const Items = [];
+            for (let i = 0; i < data.size; i++) {
+                Items.push(
+                    // <CustomerItem
+                    //     key={data.list[i].id}
+                    //     data={data.list[i]}
+                    //     deleteItem={() => deleteItem(data.list[i].id, data.list[i].status)}
+                    // />,
+                    // {discounts.map((data) => (
+                    <tr key={data.list[i].id}>
+                        <td>{data.list[i].id}</td>
+                        <td>{Moment(data.list[i].startDate).format('DD-MM-YYYY')}</td>
+                        <td>{Moment(data.list[i].endDate).format('DD-MM-YYYY')}</td>
+                        <td>{data.list[i].employee.name}</td>
+                        <td>
+                            <div className="form-button-action">
+                                <Link to={'/update-discount/' + data.list[i].id}>
+                                    <button
+                                        type="button"
+                                        data-toggle="tooltip"
+                                        title="Edit"
+                                        className="btn btn-link btn-primary btn-lg"
+                                    >
+                                        <i className="fa fa-edit"></i>
+                                    </button>
+                                </Link>
+                            </div>
+                        </td>
+                    </tr>,
+                );
+            }
+            return Items;
+        }
+    };
 
     return (
         <div className="main-panel">
@@ -90,37 +149,14 @@ function Discount() {
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                {discounts.map((data) => (
-                                                    <tr key={data.id}>
-                                                        <td>{data.id}</td>
-                                                        <td>{Moment(data.startDate).format('DD-MM-YYYY')}</td>
-                                                        <td>{Moment(data.endDate).format('DD-MM-YYYY')}</td>
-                                                        <td>{data.employee.name}</td>
-                                                        <td>
-                                                            <div className="form-button-action">
-                                                                <Link to={'/update-discount/' + data.id}>
-                                                                    <button
-                                                                        type="button"
-                                                                        data-toggle="tooltip"
-                                                                        title="Edit"
-                                                                        className="btn btn-link btn-primary btn-lg"
-                                                                    >
-                                                                        <i className="fa fa-edit"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
+                                            <tbody>{showData(discounts)}</tbody>
                                         </table>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {discounts.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={discounts.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

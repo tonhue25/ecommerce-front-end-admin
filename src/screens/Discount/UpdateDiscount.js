@@ -9,13 +9,13 @@ import { useParams, Link } from 'react-router-dom';
 import swal from 'sweetalert';
 import DatePicker from 'react-datepicker';
 import Moment from 'moment';
+import { SUCCESS } from '../../services/constant';
 function UpdateDiscount() {
     let { discountId } = useParams();
     const [startDate, setStartDate] = useState();
     const [endDate, setEndDate] = useState();
 
     const [discount, setDiscount] = useState(discountId);
-    console.log(discount);
 
     const [isReload, setIsReload] = useState(false);
 
@@ -31,8 +31,9 @@ function UpdateDiscount() {
         if (discountId != null) {
             const getOne = async () => {
                 const result = await DiscountService.getOne(discountId);
-                setData(result.data);
-                return result.data;
+                if (result.data.http_code == SUCCESS) {
+                    setData(result.data.data);
+                }
             };
             getOne();
         }
@@ -51,8 +52,9 @@ function UpdateDiscount() {
         e.preventDefault();
         data.startDate = Moment(startDate).format('YYYY-MM-DD');
         data.endDate = Moment(endDate).format('YYYY-MM-DD');
-        data.employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
-        const url = `${admin_url}/discounts`;
+        data.employeeId = JSON.parse(localStorage.getItem('accessToken')).data.account.id;
+        const url = `http://localhost:8080/api/admin/discounts`;
+        console.log(data);
         if (data.id === '') {
             Toast('warning', 'Please enter id!');
             return;
@@ -66,13 +68,20 @@ function UpdateDiscount() {
             return;
         } else {
             axios
-                .post(url, data)
+                .post(url, {
+                    id: data.id,
+                    startDate: data.startDate,
+                    endDate: data.endDate,
+                    description: data.description,
+                    employeeId: JSON.parse(localStorage.getItem('accessToken')).data.account.id,
+                })
                 .then((response) => {
-                    Toast('success', 'Successful!');
-                    discountId = response.data.id;
-                    console.log(discountId);
-                    setDiscount(response.data.id);
-                    setIsReload(false);
+                    if (response.data.http_code == SUCCESS) {
+                        Toast('success', 'Successful!');
+                        discountId = response.data.id;
+                        setDiscount(response.data.id);
+                        setIsReload(false);
+                    }
                 })
                 .catch((error) => {
                     Toast('error', 'An error occurred! Please try again!');

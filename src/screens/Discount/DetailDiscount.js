@@ -38,7 +38,7 @@ function DetailDiscount() {
     useEffect(() => {
         const getListDiscountDetail = async () => {
             const result = await DiscountDetailService.getListDiscountDetail(discountId);
-            setProducts(result.data);
+            setProducts(result.data.data.list);
         };
         getListDiscountDetail();
     }, [isReload, discountId]);
@@ -46,7 +46,7 @@ function DetailDiscount() {
     const handleSubmit = (e) => {
         setIsReload(true);
         e.preventDefault();
-        const url = `${admin_url}/discount-details`;
+        const url = `http://localhost:8080/api/admin/discount-details`;
         dataSubmit.discountId = discountId;
         axios
             .post(url, dataSubmit)

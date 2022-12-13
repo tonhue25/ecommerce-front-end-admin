@@ -3,27 +3,25 @@ import { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { admin_url } from '../../services/base_url';
+import { admin_url, user_url } from '../../services/base_url';
 import * as constant from '../../services/constant';
-import Redirect from '../../utils/Redirect';
 import Toast from '../../utils/Toast';
 
 import Moment from 'moment';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
+import * as CartService from '../../services/CartService';
 import * as InvoiceService from '../../services/InvoiceService';
 import { employees, list } from '../../services/link_redirect';
 function CartDetails() {
     let { id } = useParams();
     const [dataEmployees, setDataEmployees] = useState([]);
-    const [states, setStates] = useState();
     const [isUpdate, setIsUpdate] = useState(false);
     const [cart, setCart] = useState();
-    const [searchState, setSearchState] = useState();
+    const [searchState, setSearchState] = useState('shipping001');
 
-    const [dataCartDetails, setDataCartDetails] = useState();
-
+    // get employees in shipping department
     useEffect(() => {
         const getEmployees = async () => {
             axios
@@ -42,32 +40,52 @@ function CartDetails() {
         getEmployees();
     }, []);
 
-    const handleConfirm = (cartId, status) => {
-        let statusChange;
-        if (status === constant.WAIT) {
-            statusChange = constant.DELIVERING;
-        }
+    const handleClickCancel = (cartId) => {
         setIsUpdate(true);
-        let employeeConfirm = JSON.parse(localStorage.getItem('accessToken')).id;
+        let employeeConfirm = JSON.parse(localStorage.getItem('accessToken')).data.account.id;
         axios({
             method: 'put',
-            url: `${admin_url}/carts/${id}`,
+            url: `${user_url}/carts`,
             data: {
                 id: cartId,
-                employeeConfirm: employeeConfirm,
-                employeeDelivery: searchState,
-                state: statusChange,
+                state: constant.CANCEL,
+                dateDelivery: new Date(),
+                employeeConfirmId: employeeConfirm,
             },
         })
             .then(function (response) {
                 setIsUpdate(true);
-                Toast('success', 'Success!');
-                if (JSON.parse(localStorage.getItem('accessToken')).departmentId == 'shipping') {
-                    setTimeout(() => Redirect('my-invoices'), 3000);
+                if (response.data.http_code == constant.SUCCESS) {
+                    Toast('success', 'Success!');
                 }
-                if (JSON.parse(localStorage.getItem('accessToken')).departmentId == 'confirm') {
-                    setTimeout(() => Redirect('invoices'), 3000);
+                setIsUpdate(false);
+            })
+            .catch(function (error) {
+                setIsUpdate(false);
+            });
+        setIsUpdate(false);
+    };
+
+    const handleConfirm = (cartId) => {
+        setIsUpdate(true);
+        let employeeConfirm = JSON.parse(localStorage.getItem('accessToken')).data.account.id;
+        axios({
+            method: 'put',
+            url: `${user_url}/carts`,
+            data: {
+                id: cartId,
+                state: constant.DELIVERING,
+                dateDelivery: new Date(),
+                employeeConfirmId: employeeConfirm,
+                employeeDeliveryId: searchState,
+            },
+        })
+            .then(function (response) {
+                setIsUpdate(true);
+                if (response.data.http_code == constant.SUCCESS) {
+                    Toast('success', 'Success!');
                 }
+                setIsUpdate(false);
             })
             .catch(function (error) {
                 setIsUpdate(false);
@@ -121,6 +139,57 @@ function CartDetails() {
         };
         getOne();
     }, [isUpdate]);
+
+    useEffect(() => {
+        const getOne = async () => {
+            const response = await CartService.getOne(id);
+            if (response.data.http_code == constant.SUCCESS) {
+                setCart(response.data.data);
+            }
+        };
+        getOne();
+    }, [isUpdate]);
+
+    const showData = (cart) => {
+        if (cart.cartDetails.length > 0) {
+            const Items = [];
+            for (let i = 0; i < cart.cartDetails.length; i++) {
+                Items.push(
+                    <tr key={i}>
+                        <td
+                            style={{
+                                width: '10%',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <p className="avatar-lg ">
+                                <img src={cart.cartDetails[i].productImage} className="avatar-img rounded-circle" />
+                            </p>
+                        </td>
+                        <td>{cart.cartDetails[i].productName}</td>
+                        <td>x {cart.cartDetails[i].quantity}</td>
+                        <td>
+                            <CurrencyFormat
+                                value={cart.cartDetails[i].price}
+                                displayType={'text'}
+                                thousandSeparator={true}
+                                suffix={' đ '}
+                            />
+                        </td>
+                        <td>
+                            <CurrencyFormat
+                                value={cart.cartDetails[i].quantity * cart.cartDetails[i].price}
+                                displayType={'text'}
+                                thousandSeparator={true}
+                                suffix={' đ '}
+                            />
+                        </td>
+                    </tr>,
+                );
+            }
+            return Items;
+        }
+    };
 
     return (
         <div className="main-panel">
@@ -188,7 +257,7 @@ function CartDetails() {
                                                 <>
                                                     <div className="col-md-4 col-lg-4">
                                                         <h5>Customer Name: {cart.customerName}</h5>
-                                                        <h5>Email: {cart.emailRevicer}</h5>
+                                                        <h5>Email: {cart.emailReceiver}</h5>
 
                                                         <h5>Phone Number: {cart.phoneNumber}</h5>
                                                         <h5>Address: {cart.addressDelivery}</h5>
@@ -202,8 +271,13 @@ function CartDetails() {
                                                         </h5>
                                                         <h5>
                                                             Delivery date:{' '}
-                                                            {Moment(cart.dateDelivery).format('DD/MM/YYYY')}
+                                                            {cart.dateDelivery ? (
+                                                                Moment(cart.dateDelivery).format('DD/MM/YYYY')
+                                                            ) : (
+                                                                <></>
+                                                            )}
                                                         </h5>
+                                                        <h5>Status : {cart.state}</h5>
                                                     </div>
                                                     {invoice ? (
                                                         <></>
@@ -217,7 +291,7 @@ function CartDetails() {
                                                                 Export Employee :{' '}
                                                                 {JSON.parse(localStorage.getItem('accessToken')).name}
                                                             </h5>
-                                                            <h5>Status : {dataCartDetails.state}</h5>
+                                                            <h5>Status : {cart.state}</h5>
                                                         </div>
                                                     )}
                                                 </>
@@ -238,44 +312,10 @@ function CartDetails() {
                                                         <th>Total</th>
                                                     </tr>
                                                 </thead>
-                                                {dataCartDetails ? (
+                                                {cart ? (
                                                     <>
                                                         <tbody>
-                                                            {dataCartDetails.list.map((data, index) => (
-                                                                <tr key={index}>
-                                                                    <td
-                                                                        style={{
-                                                                            width: '10%',
-                                                                            justifyContent: 'center',
-                                                                        }}
-                                                                    >
-                                                                        <p className="avatar-lg ">
-                                                                            <img
-                                                                                src={data.productImage}
-                                                                                className="avatar-img rounded-circle"
-                                                                            />
-                                                                        </p>
-                                                                    </td>
-                                                                    <td>{data.productName}</td>
-                                                                    <td>x {data.quantity}</td>
-                                                                    <td>
-                                                                        <CurrencyFormat
-                                                                            value={data.price}
-                                                                            displayType={'text'}
-                                                                            thousandSeparator={true}
-                                                                            suffix={' đ '}
-                                                                        />
-                                                                    </td>
-                                                                    <td>
-                                                                        <CurrencyFormat
-                                                                            value={data.quantity * data.price}
-                                                                            displayType={'text'}
-                                                                            thousandSeparator={true}
-                                                                            suffix={' đ '}
-                                                                        />
-                                                                    </td>
-                                                                </tr>
-                                                            ))}
+                                                            {showData(cart)}
                                                             <tr>
                                                                 <td></td>
                                                                 <td>
@@ -286,7 +326,7 @@ function CartDetails() {
                                                                 <td>
                                                                     <h3 style={{ fontWeight: 'bolder' }}>
                                                                         <CurrencyFormat
-                                                                            value={dataCartDetails.total}
+                                                                            value={cart.totalVND || ''}
                                                                             displayType={'text'}
                                                                             thousandSeparator={true}
                                                                             suffix={' đ '}
@@ -301,36 +341,33 @@ function CartDetails() {
                                                 )}
                                             </table>
                                         </div>
-                                        <div className="row p-3" style={{ display: 'flex', justifyContent: 'center' }}>
-                                            {states == constant.WAIT &&
-                                            JSON.parse(localStorage.getItem('accessToken')).departmentId ==
-                                                'confirm' ? (
-                                                <div>
-                                                    <button
-                                                        className="btn btn-primary btn-round ml-auto mr-5"
-                                                        onClick={() => handleConfirm(id, states)}
-                                                    >
-                                                        <i className="fa fa-check" /> Xác nhận
-                                                    </button>
-                                                </div>
+                                    </div>
+                                    <div className="row p-3" style={{ display: 'flex', justifyContent: 'center' }}>
+                                        {cart ? (
+                                            cart.state == constant.WAIT ? (
+                                                <>
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-primary btn-round ml-auto mr-5"
+                                                            onClick={() => handleConfirm(id)}
+                                                        >
+                                                            <i className="fa fa-check" /> Xác nhận
+                                                        </button>
+
+                                                        <button
+                                                            className="btn btn-danger btn-round ml-auto"
+                                                            onClick={() => handleClickCancel(id)}
+                                                        >
+                                                            <i className="fa fa-trash" /> Hủy
+                                                        </button>
+                                                    </div>
+                                                </>
                                             ) : (
                                                 <></>
-                                            )}
-                                            {states == constant.DELIVERING &&
-                                            JSON.parse(localStorage.getItem('accessToken')).departmentId ==
-                                                'shipping' ? (
-                                                <div>
-                                                    <button
-                                                        className="btn btn-primary btn-round ml-auto mr-5"
-                                                        onClick={() => handleConfirm(id, states)}
-                                                    >
-                                                        <i className="fa fa-check" /> Đã giao
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <></>
-                                            )}
-                                        </div>
+                                            )
+                                        ) : (
+                                            <></>
+                                        )}
                                     </div>
                                 </div>
                             </div>

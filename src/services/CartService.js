@@ -22,7 +22,7 @@ export const changeState = async (cartId, statusChange) => {
 };
 
 export const getOne = async (id) => {
-    const res = await request_admin.get(`/carts/${id}`);
+    const res = await request_user.get(`/carts/${id}`);
     return res;
 };
 
