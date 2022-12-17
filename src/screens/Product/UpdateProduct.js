@@ -1,15 +1,16 @@
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
-import { admin_url, public_url } from '../../services/base_url';
-import * as ProductService from '../../services/ProductService';
-import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
-
 import { useParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
+import { admin_url, public_url } from '../../services/base_url';
 import { SUCCESS } from '../../services/constant';
 import { categories } from '../../services/link_redirect';
+import * as ProductService from '../../services/ProductService';
 import Redirect from '../../utils/Redirect';
+import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
 function UpdateProduct() {
     let { productId } = useParams();
     const [dataCategories, setDataCategories] = useState([]);
@@ -88,9 +89,11 @@ function UpdateProduct() {
                 .post(url, data)
                 .then((response) => {
                     if (response.data.http_code == SUCCESS) {
-                        if (file) {
-                            uploadFile(response.data.id);
-                        }
+                        console.log(response.data);
+                        // if (file) {
+                        //     uploadFile(response.data.id);
+                        // }
+                        Toast(toast_success, 'Success!');
                         setTimeout(() => Redirect(''), 5000);
                     }
                 })
@@ -345,15 +348,14 @@ function UpdateProduct() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="form-group">
-                                            <label htmlFor="description">Mô tả sản phẩm</label>
-                                            <textarea
-                                                className="form-control"
-                                                id="description"
-                                                rows={8}
+                                        <div>
+                                            <CKEditor
                                                 name="description"
-                                                onChange={onChange}
-                                                value={data.description || ''}
+                                                editor={ClassicEditor}
+                                                data={data.description}
+                                                onChange={(event, editor) => {
+                                                    data.description = editor.getData();
+                                                }}
                                             />
                                         </div>
                                     </div>

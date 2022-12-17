@@ -20,20 +20,12 @@ function UpdateEmployee() {
         birthday: '',
         address: '',
         salary: 0,
-        departmentId: 'confirm',
+        departmentId: '',
         status: 'true',
+        roleId: 'EMPLOYEE',
     });
 
-    useEffect(() => {
-        if (employeeId != null) {
-            const getOne = async () => {
-                const result = await EmployeeService.getOne(employeeId);
-                setData(result.data.data);
-                return result.data.data;
-            };
-            getOne();
-        }
-    }, []);
+    const [departmentId, setDepartmentId] = useState('');
 
     const [isUpdate, setIsUpdate] = useState(() => {
         if (employeeId == null) {
@@ -42,6 +34,20 @@ function UpdateEmployee() {
             return true;
         }
     });
+
+    useEffect(() => {
+        if (employeeId != null) {
+            const getOne = async () => {
+                const result = await EmployeeService.getOne(employeeId);
+                if (result.data.http_code == SUCCESS) {
+                    setData(result.data.data);
+                    setDepartmentId(result.data.data.department.id);
+                }
+                return result.data.data;
+            };
+            getOne();
+        }
+    }, [employeeId, isUpdate, departments]);
 
     const onChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
@@ -60,6 +66,12 @@ function UpdateEmployee() {
     const handleUpdate = (e) => {
         e.preventDefault();
         data.roleId = EMPLOYEE;
+        if (!data.departmentId && departmentId) {
+            data.departmentId = departmentId;
+        }
+        if (!data.departmentId && !departmentId) {
+            data.departmentId = departments[0].id;
+        }
         if (data.id === '') {
             Toast(toast_warning, 'Please enter id!');
             return;
@@ -88,8 +100,10 @@ function UpdateEmployee() {
             axios
                 .post(url, data)
                 .then((response) => {
-                    Toast(toast_success, 'Successful!');
-                    setTimeout(() => Redirect(`/${employees}`), 3000);
+                    if (response.data.http_code == SUCCESS) {
+                        Toast(toast_success, 'Successful!');
+                        setTimeout(() => Redirect(`/${employees}`), 3000);
+                    }
                 })
                 .catch((error) => {
                     Toast(toast_error, 'An error occurred! Please try again!');
@@ -172,13 +186,15 @@ function UpdateEmployee() {
                                                                 key={item.id}
                                                                 value={item.id}
                                                                 name="departmentId"
-                                                                selected={item.id === data.departmentId}
+                                                                onChange={onChange}
+                                                                selected={departmentId === item.id ? true : false}
                                                             >
                                                                 {item.name}
                                                             </option>
                                                         ))}
                                                     </select>
                                                 </div>
+                                                <option>{data.departmentId}</option>
                                                 <div className="form-check mb-1 mt-1">
                                                     <label>status</label>
                                                     <br />
@@ -247,7 +263,6 @@ function UpdateEmployee() {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="card-action" style={{ textAlign: 'center' }}>
                                         <button type="submit" className="btn btn-success mr-5" onClick={handleUpdate}>
                                             {isUpdate ? 'Update' : 'Add'}

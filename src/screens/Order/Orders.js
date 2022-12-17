@@ -1,27 +1,43 @@
+import { Pagination } from '@mui/material';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as OrderService from '../../services/OrderService';
-import { Pagination } from '@mui/material';
-import { PAGE_SIZE } from '../../services/constant';
-
+import { PAGE_ONE, PAGE_SIZE, SUCCESS } from '../../services/constant';
 function Orders() {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
     const [orders, setOrders] = useState([]);
 
+    const [dataSubmit, setDataSubmit] = useState({
+        size: PAGE_SIZE,
+        page: page,
+    });
+
     useEffect(() => {
-        const getOrders = async () => {
-            const result = await OrderService.getOrders(page, PAGE_SIZE);
-            setOrders(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data.list;
+        dataSubmit.page = page;
+        const getOrderDetails = async () => {
+            axios
+                .post(`http://localhost:8080/api/admin/orders/list`, dataSubmit)
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setOrders(response.data.data.list);
+                        setTotalPages(response.data.data.totalPages);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getOrders();
-    }, [page]);
+        getOrderDetails();
+    }, [dataSubmit, page]);
 
     function handleChange(page) {
         setPage(page);
     }
+
+    const onChange = (e) => {
+        setDataSubmit({ ...dataSubmit, [e.target.name]: e.target.value });
+    };
 
     return (
         <div className="main-panel">
@@ -34,7 +50,19 @@ function Orders() {
                                     <div className="d-flex align-items-center">
                                         <div className="col-md-6 col-lg-4"></div>
                                         <div className="col-md-4 col-lg-6"></div>
-                                        <div className="col-md-2 col-lg-2"></div>
+                                        <div className="col-md-2 col-lg-2">
+                                            <div className="form-group form-group-default">
+                                                <div className="form-group">
+                                                    <label>Items</label>
+                                                    <select name="size" onChange={onChange} className="form-control">
+                                                        <option>{PAGE_SIZE}</option>
+                                                        <option>10</option>
+                                                        <option>15</option>
+                                                        <option>20</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="card-body">

@@ -1,53 +1,62 @@
+import { Pagination } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { PAGE_SIZE } from '../../services/constant';
-import CommentItem from '../Comment/CommentItem';
+import { useParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import * as CommentService from '../../services/CommentService';
 import * as ProductService from '../../services/ProductService';
-import { Pagination, Rating } from '@mui/material';
 import Toast from '../../utils/Toast';
-import { ToastContainer } from 'react-toastify';
+import CommentItem from '../Comment/CommentItem';
+import axios from 'axios';
+import { PAGE_SIZE } from '../../services/constant';
+import { public_url } from '../../services/base_url';
 function Comments() {
     let { productId } = useParams();
-
     const [page, setPage] = useState(1);
     const [data, setData] = useState([]);
-    const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
-    const [totalPagesComment, setTotalPagesComment] = useState();
-    const [totalItemsComment, setTotalItemsComment] = useState();
-    const [state, setState] = useState(0);
-    const [totals, setTotals] = useState(0);
+    const [state, setState] = useState([]);
     const [product, setProduct] = useState([]);
     const [isDelete, setIsDelete] = useState(false);
 
     useEffect(() => {
-        const fetchApiComment = async () => {
-            const result = await CommentService.getListComment(productId, page, PAGE_SIZE, state);
-            setData(result.data.list);
-            setTotalPagesComment(result.data.totalPages);
-            setTotalItemsComment(result.data.totalItems);
-            setTotals(result.data.totals);
-            return result.data.list;
+        const getComments = async () => {
+            axios
+                .post(`${public_url}/comments`, {
+                    page: page,
+                    size: PAGE_SIZE,
+                    productId: productId,
+                    status: 1,
+                    points: state,
+                })
+                .then(function (response) {
+                    if (response.data.http_code) {
+                        setData(response.data.data);
+                        if (response.data.data.object) {
+                            setProduct(response.data.data.object);
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        fetchApiComment();
-    }, [state, page, isDelete]);
+        getComments();
+    }, [page, isDelete, state]);
 
-    function ShowComments(data) {
-        return data.map((item) => <CommentItem key={item.id} data={item} deleteItem={() => deleteItem(item.id)} />);
-    }
-
-    useEffect(() => {
-        if (productId != null) {
-            const getOne = async () => {
-                const result = await ProductService.getOne(productId);
-                setProduct(result.data);
-                console.log(result.data);
-                return result.data;
-            };
-            getOne();
+    const ShowComments = (data) => {
+        if (data.size > 0) {
+            const Items = [];
+            for (let i = 0; i < data.size; i++) {
+                Items.push(
+                    <CommentItem
+                        key={data.list[i].id}
+                        data={data.list[i]}
+                        deleteItem={() => deleteItem(data.list[i].id, data.list[i].status)}
+                    />,
+                );
+            }
+            return Items;
         }
-    }, []);
+    };
 
     const deleteItem = (id) => {
         const deleteItem = async () => {
@@ -89,9 +98,11 @@ function Comments() {
                                                 <button
                                                     type="button"
                                                     className={
-                                                        state == 0 ? 'btn btn-primary' : 'btn btn-outline-primary'
+                                                        state.length == 0
+                                                            ? 'btn btn-primary'
+                                                            : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(0)}
+                                                    onClick={() => setState([])}
                                                 >
                                                     Tất cả
                                                 </button>
@@ -102,7 +113,7 @@ function Comments() {
                                                     className={
                                                         state == 1 ? 'btn btn-primary' : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(1)}
+                                                    onClick={() => setState([1])}
                                                 >
                                                     1 sao
                                                 </button>
@@ -113,7 +124,7 @@ function Comments() {
                                                     className={
                                                         state == 2 ? 'btn btn-primary' : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(2)}
+                                                    onClick={() => setState([2])}
                                                 >
                                                     2 sao
                                                 </button>
@@ -124,7 +135,7 @@ function Comments() {
                                                     className={
                                                         state == 3 ? 'btn btn-primary' : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(3)}
+                                                    onClick={() => setState([3])}
                                                 >
                                                     3 sao
                                                 </button>
@@ -135,7 +146,7 @@ function Comments() {
                                                     className={
                                                         state == 4 ? 'btn btn-primary' : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(4)}
+                                                    onClick={() => setState([4])}
                                                 >
                                                     4 sao
                                                 </button>
@@ -146,7 +157,7 @@ function Comments() {
                                                     className={
                                                         state == 5 ? 'btn btn-primary' : 'btn btn-outline-primary'
                                                     }
-                                                    onClick={() => setState(5)}
+                                                    onClick={() => setState([5])}
                                                 >
                                                     5 sao
                                                 </button>
@@ -169,10 +180,10 @@ function Comments() {
                                         </table>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {data.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={data.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

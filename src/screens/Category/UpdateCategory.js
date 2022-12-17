@@ -8,7 +8,7 @@ import * as CategoryService from '../../services/CategoryService';
 import { SUCCESS } from '../../services/constant';
 import { categories } from '../../services/link_redirect';
 import Redirect from '../../utils/Redirect';
-import Toast, { toast_error, toast_warning } from '../../utils/Toast';
+import Toast, { toast_error, toast_success, toast_warning } from '../../utils/Toast';
 function UpdateCategory() {
     let { categoryId } = useParams();
 
@@ -43,6 +43,7 @@ function UpdateCategory() {
     };
 
     const handleUpdate = (e) => {
+        console.log(data);
         e.preventDefault();
         const url = `${admin_url}/${categories}`;
         if (data.id === '') {
@@ -56,13 +57,16 @@ function UpdateCategory() {
             axios
                 .post(url, data)
                 .then((response) => {
-                    Toast(SUCCESS, 'Successful!');
-                    if (file) {
-                        uploadFile(response.data.id);
+                    if (response.data.http_code == 'SUCCESS') {
+                        Toast(toast_success, 'Successful!');
+                        setTimeout(() => Redirect(`/${categories}`), 3000);
                     }
-                    setTimeout(() => Redirect(categories), 3000);
+                    // if (file) {
+                    //     uploadFile(response.data.id);
+                    // }
                 })
                 .catch((e) => {
+                    console.log(e);
                     Toast(toast_error, 'An error occurred! Please try again!');
                 });
         }

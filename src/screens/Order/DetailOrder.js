@@ -1,176 +1,117 @@
-import { ToastContainer } from 'react-toastify';
-import { useState, useEffect } from 'react';
-import * as ProductService from '../../services/ProductService';
-import * as SupplierService from '../../services/SupplierService';
-import * as SupplyService from '../../services/SupplyService';
-import { admin_url } from '../../services/base_url';
 import axios from 'axios';
-import Toast from '../../utils/Toast';
-import swal from 'sweetalert';
-import Redirect from '../../utils/Redirect';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import ProductItem from '../Order/ProductItem';
-import * as OrderDetailService from '../../services/OrderDetailService';
 import { useParams } from 'react-router-dom';
-import OrderItem from '../Order/OrderItem';
+import { ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
+import { admin_url } from '../../services/base_url';
+import { SUCCESS } from '../../services/constant';
+import * as OrderDetailService from '../../services/OrderDetailService';
+import * as SupplierService from '../../services/SupplierService';
+import Redirect from '../../utils/Redirect';
+import Toast from '../../utils/Toast';
+import ProductItem from '../Order/ProductItem';
 function DetailOrder() {
     let { id } = useParams();
 
-    const [suppliers, setSuppliers] = useState([]);
-    const [supplies, setSupplies] = useState([]);
     const [products, setProducts] = useState([]);
-    const [categoryId, setCategoryId] = useState('balo');
-    const [productId, setProductId] = useState('');
     const [isReload, setIsReload] = useState(false);
-    const [data, setData] = useState([]);
     const [endDate, setEndDate] = useState(new Date());
-    const [details, setDetails] = useState([]);
-    const [isDisplay, setIsDisplay] = useState(false);
-    const [signal, setSignal] = useState(false);
 
-    const [dataOrder, setDataOrder] = useState({
-        id: '',
-        purchaseDate: '',
-        supplierId: 'supplier001',
-        employeeId: '',
-    });
+    const [categoryId, setCategoryId] = useState();
 
     const [dataDetailOrder, setDataDetailOrder] = useState({
-        orderId: '',
+        orderId: id,
         productId: '',
         quantity: '',
         price: '',
         signal: '',
     });
-
+    // get order and order detail.
+    const [data, setData] = useState();
     useEffect(() => {
-        if (id == null) {
-            id = dataOrder.id;
-        }
-        const getListOrderDetailByOrder = async () => {
-            const result = await OrderDetailService.getListOrderDetailByOrder(id, 1, 5);
-            setDetails(result.data.list);
-            return result.data.list;
+        const getOrderDetails = async () => {
+            axios
+                .get(`http://localhost:8080/api/admin/orders/${id}`)
+                .then(function (response) {
+                    if (response.data.http_code == SUCCESS) {
+                        setData(response.data.data);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getListOrderDetailByOrder();
-    }, [id, isReload]);
+        getOrderDetails();
+    }, [isReload, id]);
 
+    // display order and order detail.
+    const showData = (data) => {
+        if (data) {
+            const Items = [];
+            for (let i = 0; i < data.orderDetails.length; i++) {
+                Items.push(
+                    <ProductItem
+                        updateData={() => updateData(data.orderDetails[i])}
+                        key={data.orderDetails[i].id}
+                        data={data.orderDetails[i]}
+                        deleteProduct={() =>
+                            deleteProduct(data.orderDetails[i].order.id, data.orderDetails[i].product.id)
+                        }
+                    />,
+                );
+            }
+            return Items;
+        }
+    };
+
+    // get all suppliers
+    const [suppliers, setSuppliers] = useState([]);
     useEffect(() => {
-        const getAllSuppliers = async () => {
+        const getSuppliers = async () => {
             const result = await SupplierService.getAllSuppliers();
             setSuppliers(result.data);
-            return result.data;
         };
-        getAllSuppliers();
-    }, []);
+        getSuppliers();
+    }, [data]);
 
+    // get category by supplier
+    const [categories, setCategories] = useState([]);
     useEffect(() => {
-        const getSupplyBySupplier = async () => {
-            const result = await SupplyService.getSupplyBySupplier(dataOrder.supplierId);
-            setSupplies(result.data);
-            return result.data;
-        };
-        getSupplyBySupplier();
-    }, [dataOrder.supplierId]);
-
-    useEffect(() => {
-        const getProductByCategory = async () => {
-            const result = await ProductService.getProductByCategory(categoryId);
-            setProducts(result.data);
-            return result.data;
-        };
-        getProductByCategory();
-    }, [categoryId]);
-
-    useEffect(() => {
-        if (productId != null) {
-            const getOne = async () => {
-                const result = await ProductService.getOne(dataDetailOrder.productId);
-                setData(result.data);
-                return result.data;
+        if (data) {
+            const getCategoryBySupplier = async () => {
+                axios
+                    .get(`http://localhost:8080/api/admin/suppliers/${data.supplier.id}`)
+                    .then(function (response) {
+                        setCategories(response.data);
+                        setCategoryId(response.data[0].categoryId);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             };
-            getOne();
+            getCategoryBySupplier();
         }
-    }, [dataDetailOrder.productId]);
+    }, [suppliers]);
 
+    // get product of category.
     useEffect(() => {
-        if (JSON.parse(localStorage.getItem('dataOrder'))) {
-            setIsReload(false);
-        } else {
-            setIsReload(true);
+        if (categories && categoryId) {
+            const getProductByCategory = async () => {
+                axios
+                    .get(`http://localhost:8080/api/public/categories/${categoryId}`)
+                    .then(function (response) {
+                        setProducts(response.data.data.products);
+                        dataDetailOrder.productId = response.data.data.products[0].id;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            };
+            getProductByCategory();
         }
-    }, [JSON.parse(localStorage.getItem('dataOrder')), isReload]);
-
-    const handleSubmitOrder = (e) => {
-        e.preventDefault();
-        dataOrder.employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
-        dataOrder.purchaseDate = endDate;
-        const url = `${admin_url}/orders`;
-        axios
-            .post(url, dataOrder)
-            .then((response) => {
-                setIsReload(true);
-                Toast('success', 'Thêm thành công!');
-                localStorage.setItem('dataOrder', JSON.stringify(response.data));
-                setIsDisplay(true);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
-    };
-
-    const handleSubmitDetailOrder = (e) => {
-        e.preventDefault();
-        setIsReload(true);
-        if (id != null) {
-            dataDetailOrder.orderId = id;
-        } else {
-            dataDetailOrder.orderId = JSON.parse(localStorage.getItem('dataOrder')).id;
-        }
-        if (signal) {
-            dataDetailOrder.signal = 'update';
-        } else {
-            dataDetailOrder.signal = 'add';
-        }
-        const url = `${admin_url}/order-details`;
-        axios
-            .post(url, dataDetailOrder)
-            .then((response) => {
-                setIsReload(true);
-                if (signal) {
-                    Toast('success', 'Chỉnh sửa thành công!');
-                } else {
-                    Toast('success', 'Thêm thành công!');
-                }
-                setSignal(false);
-            })
-            .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
-            });
-        setIsReload(false);
-    };
-
-    useEffect(() => {
-        if (JSON.parse(localStorage.getItem('dataOrder'))) {
-            if (id != null) {
-                dataOrder.id = id;
-            } else {
-                dataOrder.id = JSON.parse(localStorage.getItem('dataOrder')).id;
-            }
-            dataOrder.purchaseDate = JSON.parse(localStorage.getItem('dataOrder')).purchaseDate;
-            dataOrder.supplierId = JSON.parse(localStorage.getItem('dataOrder')).supplierId;
-            dataOrder.employeeId = JSON.parse(localStorage.getItem('dataOrder')).employeeId;
-        }
-    }, [JSON.parse(localStorage.getItem('dataOrder')), isReload]);
-
-    const onChange = (e) => {
-        setDataOrder({ ...dataOrder, [e.target.name]: e.target.value });
-    };
-
-    const onChangeDetail = (e) => {
-        setDataDetailOrder({ ...dataDetailOrder, [e.target.name]: e.target.value });
-    };
+    }, [categories, categoryId]);
 
     const handleClickCancel = (e) => {
         e.preventDefault();
@@ -187,26 +128,6 @@ function DetailOrder() {
         });
     };
 
-    // allow user update info about item.
-    function ShowProducts() {
-        return details.map((item) => (
-            <ProductItem
-                updateData={() => updateData(item)}
-                key={item.id}
-                data={item}
-                deleteProduct={() => deleteProduct(item.order.id, item.product.id)}
-            />
-        ));
-    }
-
-    const updateData = (data) => {
-        const updateData = async () => {
-            setDataDetailOrder(data);
-            setSignal(true);
-        };
-        updateData();
-    };
-
     const deleteProduct = (orderId, productId) => {
         const deleteItem = async () => {
             await OrderDetailService.deleteItem(orderId, productId);
@@ -216,6 +137,41 @@ function DetailOrder() {
         deleteItem();
     };
 
+    const onChangedataDetailOrder = (e) => {
+        setDataDetailOrder({ ...dataDetailOrder, [e.target.name]: e.target.value });
+    };
+    const [signal, setSignal] = useState(false);
+    const handleSubmitDetailOrder = (e) => {
+        e.preventDefault();
+        console.log(dataDetailOrder);
+        if (id != null) {
+            dataDetailOrder.orderId = id;
+        }
+        if (signal) {
+            dataDetailOrder.signal = 'update';
+        } else {
+            dataDetailOrder.signal = 'add';
+        }
+        const url = `${admin_url}/order-details`;
+        axios
+            .post(url, dataDetailOrder)
+            .then((response) => {
+                setIsReload(true);
+                Toast('success', 'Chỉnh sửa thành công!');
+            })
+            .catch((error) => {
+                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+            });
+        setIsReload(false);
+    };
+
+    const updateData = (data) => {
+        const updateData = async () => {
+            setDataDetailOrder(data);
+            setSignal(true);
+        };
+        updateData();
+    };
     return (
         <div className="main-panel">
             <ToastContainer />
@@ -231,12 +187,11 @@ function DetailOrder() {
                                                 <div className="form-group">
                                                     <label htmlFor="id">Order Id</label>
                                                     <input
-                                                        disabled={isReload ? false : true}
+                                                        // disabled={isReload ? false : true}
                                                         className="form-control"
                                                         type="text"
                                                         name="id"
-                                                        value={id || dataOrder.id || ''}
-                                                        onChange={onChange}
+                                                        value={data ? data.id : ''}
                                                     />
                                                 </div>
                                                 <div className="form-group">
@@ -246,7 +201,7 @@ function DetailOrder() {
                                                         placeholderText="dd/mm/yyyy"
                                                         dateFormat="dd/MM/yyyy"
                                                         className="form-control"
-                                                        selected={endDate || new Date()}
+                                                        value={data ? data.purchaseDate : new Date()}
                                                         onChange={(date: Date) => setEndDate(date)}
                                                     />
                                                 </div>
@@ -256,9 +211,8 @@ function DetailOrder() {
                                                     <div className="form-group">
                                                         <label>Supplier</label>
                                                         <select
-                                                            disabled={isReload ? false : true}
+                                                            // disabled={isReload ? false : true}
                                                             className="form-control form-control"
-                                                            onChange={onChange}
                                                             name="supplierId"
                                                         >
                                                             {suppliers.map((item) => (
@@ -266,7 +220,9 @@ function DetailOrder() {
                                                                     key={item.id}
                                                                     value={item.id}
                                                                     name="supplierId"
-                                                                    selected={item.id === dataOrder.supplierId}
+                                                                    selected={
+                                                                        data ? item.id === data.supplier.id : <></>
+                                                                    }
                                                                 >
                                                                     {item.id + ' - ' + item.name}
                                                                 </option>
@@ -274,6 +230,7 @@ function DetailOrder() {
                                                         </select>
                                                     </div>
                                                 </div>
+
                                                 <div className="form-group form-group-default">
                                                     <div className="form-group">
                                                         <label>Category</label>
@@ -281,14 +238,14 @@ function DetailOrder() {
                                                             className="form-control form-control"
                                                             onChange={(e) => setCategoryId(e.target.value)}
                                                         >
-                                                            {supplies.map((item) => (
+                                                            {categories.map((item) => (
                                                                 <option
                                                                     key={item.categoryId}
                                                                     value={item.categoryId}
                                                                     name="categoryId"
-                                                                    selected={item.id === categoryId}
+                                                                    // selected={item.id === categoryId}
                                                                 >
-                                                                    {item.category.name}
+                                                                    {item.category ? item.category.name : ''}
                                                                 </option>
                                                             ))}
                                                         </select>
@@ -297,10 +254,9 @@ function DetailOrder() {
                                             </div>
                                             <div className="col-md-6 col-lg-1">
                                                 <button
-                                                    // disabled={isUpdate ? false : true}
                                                     type="submit"
                                                     className="btn btn-success"
-                                                    onClick={handleSubmitOrder}
+                                                    // onClick={handleSubmitOrder}
                                                 >
                                                     Add
                                                 </button>
@@ -310,40 +266,45 @@ function DetailOrder() {
                                 </div>
                                 <form>
                                     <div className="card-header">
-                                        <div className="d-flex align-items-center">
-                                            <div className="col-md-4 col-lg-4">
-                                                <div className="form-group form-group-default">
-                                                    <div className="form-group">
-                                                        <label>Product</label>
-                                                        <select
-                                                            className="form-control form-control"
-                                                            // onChange={(e) => setProductId(e.target.value)}
-                                                            onChange={onChangeDetail}
-                                                            name="productId"
-                                                        >
-                                                            {products.map((item) => (
-                                                                <option
-                                                                    key={item.id}
-                                                                    value={item.id}
-                                                                    name="productId"
-                                                                    // selected={item.id === productId}
-                                                                    selected={item.id === dataDetailOrder.productId}
-                                                                >
-                                                                    {item.id + ' - ' + item.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                        {/* {dataSupply.categoryId ? ( */}
+                                        <>
+                                            <div className="d-flex align-items-center">
+                                                <div className="col-md-4 col-lg-4">
+                                                    <div className="form-group form-group-default">
+                                                        <div className="form-group">
+                                                            <label>Product</label>
+                                                            <select
+                                                                className="form-control form-control"
+                                                                name="productId"
+                                                                onChange={onChangedataDetailOrder}
+                                                            >
+                                                                {products.map((item) => (
+                                                                    <option
+                                                                        key={item.id}
+                                                                        value={item.id}
+                                                                        name="productId"
+                                                                        // selected={item.id === productId}
+                                                                        // selected={item.id === dataDetailOrder.productId}
+                                                                    >
+                                                                        {item.id + ' - ' + item.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-4 col-lg-8">
+                                                    <div className="table-responsive">
+                                                        <table className="display table table-striped table-hover">
+                                                            {/* <tbody>{<OrderItem key={data.id} data={data} />}</tbody> */}
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-4 col-lg-8">
-                                                <div className="table-responsive">
-                                                    <table className="display table table-striped table-hover">
-                                                        <tbody>{<OrderItem key={data.id} data={data} />}</tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </>
+                                        {/* ) : (
+                                            <></>
+                                        )} */}
                                     </div>
                                     <div className="card-header">
                                         <div className="d-flex align-items-center">
@@ -355,7 +316,7 @@ function DetailOrder() {
                                                         className="form-control"
                                                         name="quantity"
                                                         value={parseInt(dataDetailOrder.quantity) || ''}
-                                                        onChange={onChangeDetail}
+                                                        onChange={onChangedataDetailOrder}
                                                     />
                                                 </div>
                                                 <div className="form-group">
@@ -364,8 +325,9 @@ function DetailOrder() {
                                                         type="number"
                                                         className="form-control"
                                                         name="price"
+                                                        onChange={onChangedataDetailOrder}
                                                         value={parseInt(dataDetailOrder.price) || ''}
-                                                        onChange={onChangeDetail}
+                                                        // onChange={onChangeDetail}
                                                     />
                                                 </div>
                                                 <div className="card-action" style={{ textAlign: 'center' }}>
@@ -398,7 +360,7 @@ function DetailOrder() {
                                                                 <th></th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>{ShowProducts()}</tbody>
+                                                        <tbody>{showData(data)}</tbody>
                                                     </table>
                                                 </div>
                                             </div>

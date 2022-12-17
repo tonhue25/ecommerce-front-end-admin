@@ -1,24 +1,16 @@
-import { ToastContainer } from 'react-toastify';
-import { useState, useEffect } from 'react';
-import * as ProductService from '../../services/ProductService';
-import { admin_url } from '../../services/base_url';
 import axios from 'axios';
-import Toast from '../../utils/Toast';
-import Redirect from '../../utils/Redirect';
-import { useParams } from 'react-router-dom';
-import swal from 'sweetalert';
-import DatePicker from 'react-datepicker';
 import Moment from 'moment';
-
-import * as WarrantyService from '../../services/WarrantyService';
+import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import { useParams } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
+import { admin_url } from '../../services/base_url';
+import Redirect from '../../utils/Redirect';
+import Toast from '../../utils/Toast';
 
 function Warranty() {
     let { productId } = useParams();
-    const [data, setData] = useState({
-        id: '',
-        name: '',
-        image: '',
-    });
 
     const [startDay, setStartDay] = useState();
     const [endDay, setEndDay] = useState();
@@ -29,35 +21,27 @@ function Warranty() {
         endDay: Moment(endDay).format('YYYY-MM-DD'),
         employeeId: JSON.parse(localStorage.getItem('accessToken')).id,
         productId: productId,
+        product: {},
     });
 
     useEffect(() => {
-        if (productId != null) {
-            const getOne = async () => {
-                const result = await ProductService.getOne(productId);
-                setData(result.data);
-                return result.data;
-            };
-            getOne();
-        }
-    }, []);
-
-    useEffect(() => {
-        if (warrantyData.id != null && warrantyData.employeeId != null) {
-            const getOne = async () => {
-                const result = await WarrantyService.getOne(warrantyData.employeeId, productId);
-                setWarrantyData(result.data);
-                return result.data;
-            };
-            getOne();
-        }
-    }, [warrantyData]);
+        axios
+            .get(`${admin_url}/warranties?productId=${productId}`)
+            .then(function (response) {
+                if (response.data.http_code == 'SUCCESS') {
+                    setWarrantyData(response.data.data);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }, [productId]);
 
     const handleUpdate = (e) => {
         e.preventDefault();
         warrantyData.startDay = Moment(startDay).format('YYYY-MM-DD');
         warrantyData.endDay = Moment(endDay).format('YYYY-MM-DD');
-        warrantyData.employeeId = JSON.parse(localStorage.getItem('accessToken')).id;
+        warrantyData.employeeId = JSON.parse(localStorage.getItem('accessToken')).data.account.id;
         warrantyData.productId = productId;
         const url = `${admin_url}/warranties`;
         if (warrantyData.id === '') {
@@ -130,48 +114,54 @@ function Warranty() {
                                     </div>
                                     <div className="card-body">
                                         <div className="row">
-                                            <div className="col-md-6 col-lg-6">
-                                                <div className="form-group">
-                                                    <label htmlFor="id">Mã sản phẩm</label>
-                                                    <input
-                                                        disabled={true}
-                                                        type="text"
-                                                        className="form-control"
-                                                        placeholder="Nhập mã sản phẩm"
-                                                        name="id"
-                                                        value={data.id || ''}
-                                                    />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label htmlFor="name">Tên sản phẩm</label>
-                                                    <input
-                                                        disabled={true}
-                                                        type="text"
-                                                        className="form-control"
-                                                        placeholder="Nhập tên sản phẩm"
-                                                        name="name"
-                                                        value={data.name || ''}
-                                                    />
-                                                </div>
-                                                <div className="form-group">
-                                                    <div className="row">
-                                                        <div className="col-4 col-sm-4"></div>
-                                                        <div className="col-4 col-sm-4">
-                                                            <img
-                                                                src={data.image || ''}
-                                                                alt="title"
-                                                                className=""
-                                                                style={{
-                                                                    textAlign: 'center',
-                                                                    width: '200px',
-                                                                    height: '200px',
-                                                                }}
+                                            {warrantyData.product ? (
+                                                <>
+                                                    <div className="col-md-6 col-lg-6">
+                                                        <div className="form-group">
+                                                            <label htmlFor="id">Mã sản phẩm</label>
+                                                            <input
+                                                                disabled={true}
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Nhập mã sản phẩm"
+                                                                name="id"
+                                                                value={warrantyData.product.id || ''}
                                                             />
                                                         </div>
-                                                        <div className="col-4 col-sm-4"></div>
+                                                        <div className="form-group">
+                                                            <label htmlFor="name">Tên sản phẩm</label>
+                                                            <input
+                                                                disabled={true}
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Nhập tên sản phẩm"
+                                                                name="name"
+                                                                value={warrantyData.product.name || ''}
+                                                            />
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="row">
+                                                                <div className="col-4 col-sm-4"></div>
+                                                                <div className="col-4 col-sm-4">
+                                                                    <img
+                                                                        src={warrantyData.product.image || ''}
+                                                                        alt="title"
+                                                                        className=""
+                                                                        style={{
+                                                                            textAlign: 'center',
+                                                                            width: '200px',
+                                                                            height: '200px',
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div className="col-4 col-sm-4"></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
+                                                </>
+                                            ) : (
+                                                <></>
+                                            )}
                                             <div className="col-md-6 col-lg-6">
                                                 <div className="form-group">
                                                     <label htmlFor="id">Warranty Id</label>

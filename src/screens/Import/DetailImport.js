@@ -38,7 +38,7 @@ function DetailImport() {
     useEffect(() => {
         const getOrders = async () => {
             const result = await OrderService.getOrders(0, 0);
-            setOrders(result.data.list);
+            setOrders(result.data.data.list);
             return result.data.list;
         };
         getOrders();
