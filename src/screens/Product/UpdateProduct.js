@@ -21,7 +21,7 @@ function UpdateProduct() {
         price: '',
         inventoryNumber: '',
         description: '',
-        categoryId: 'balo',
+        categoryId: '',
         isNew: 'true',
         status: 'true',
         image: '',
@@ -68,6 +68,15 @@ function UpdateProduct() {
 
     const handleUpdate = (e) => {
         e.preventDefault();
+        if (file) {
+            uploadFile(e);
+        } else {
+            createOrUpdate(data.image);
+        }
+    };
+
+    const createOrUpdate = (urlImage) => {
+        data.image = urlImage;
         const url = `${admin_url}/products`;
         if (data.id === '') {
             Toast(toast_warning, 'Please enter id!');
@@ -89,12 +98,10 @@ function UpdateProduct() {
                 .post(url, data)
                 .then((response) => {
                     if (response.data.http_code == SUCCESS) {
-                        console.log(response.data);
-                        // if (file) {
-                        //     uploadFile(response.data.id);
-                        // }
                         Toast(toast_success, 'Success!');
                         setTimeout(() => Redirect(''), 5000);
+                    } else {
+                        Toast(toast_error, 'An error occurred! Please try again!');
                     }
                 })
                 .catch((e) => {
@@ -103,12 +110,10 @@ function UpdateProduct() {
         }
     };
 
-    function uploadFile(id) {
-        const url = `${public_url}/products/image`;
+    function uploadFile() {
+        const url = `${public_url}/upload-files`;
         const formData = new FormData();
-        formData.append('id', id);
         formData.append('file', file);
-        formData.append('fileName', file.name);
         const config = {
             headers: {
                 'content-type': 'multipart/form-data',
@@ -117,7 +122,9 @@ function UpdateProduct() {
         axios
             .post(url, formData, config)
             .then((response) => {
-                // Toast('success', 'Successfully updated!!');
+                if (response.data.http_code == SUCCESS) {
+                    createOrUpdate(response.data.data);
+                }
             })
             .catch((error) => {
                 Toast(toast_error, 'Something went wrong : ' + error);

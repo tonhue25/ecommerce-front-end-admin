@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
-import { admin_url } from '../../services/base_url';
+import { admin_url, public_url } from '../../services/base_url';
 import * as CategoryService from '../../services/CategoryService';
 import { SUCCESS } from '../../services/constant';
 import { categories } from '../../services/link_redirect';
@@ -43,8 +43,16 @@ function UpdateCategory() {
     };
 
     const handleUpdate = (e) => {
-        console.log(data);
         e.preventDefault();
+        if (file) {
+            uploadFile(e);
+        } else {
+            createOrUpdate(data.image);
+        }
+    };
+
+    const createOrUpdate = (urlImage) => {
+        data.image = urlImage;
         const url = `${admin_url}/${categories}`;
         if (data.id === '') {
             Toast(toast_warning, 'Please enter id!');
@@ -60,13 +68,11 @@ function UpdateCategory() {
                     if (response.data.http_code == 'SUCCESS') {
                         Toast(toast_success, 'Successful!');
                         setTimeout(() => Redirect(`/${categories}`), 3000);
+                    } else {
+                        Toast(toast_error, 'An error occurred! Please try again!');
                     }
-                    // if (file) {
-                    //     uploadFile(response.data.id);
-                    // }
                 })
                 .catch((e) => {
-                    console.log(e);
                     Toast(toast_error, 'An error occurred! Please try again!');
                 });
         }
@@ -86,12 +92,10 @@ function UpdateCategory() {
         });
     };
 
-    function uploadFile(id) {
-        const url = `${admin_url}/${categories}/image`;
+    function uploadFile() {
+        const url = `${public_url}/upload-files`;
         const formData = new FormData();
-        formData.append('id', id);
         formData.append('file', file);
-        formData.append('fileName', file.name);
         const config = {
             headers: {
                 'content-type': 'multipart/form-data',
@@ -100,7 +104,9 @@ function UpdateCategory() {
         axios
             .post(url, formData, config)
             .then((response) => {
-                // Toast('success', 'Successfully updated!!');
+                if (response.data.http_code == SUCCESS) {
+                    createOrUpdate(response.data.data);
+                }
             })
             .catch((e) => {
                 Toast(toast_error, 'Something went wrong : ' + e);
