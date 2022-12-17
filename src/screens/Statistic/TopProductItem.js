@@ -6,25 +6,26 @@ import CurrencyFormat from 'react-currency-format';
 function TopProductItem({ data }) {
     const [values, setValues] = useState({});
     const [point, setPoint] = useState(0);
+
     useEffect(() => {
         if (data != null) {
             const getOne = async () => {
                 const result = await ProductService.getOne(data.productId);
-                setValues(result.data);
+                setValues(result.data.data);
                 return result.data;
             };
             getOne();
         }
     }, []);
 
-    useEffect(() => {
-        const fetchApiGetPoint = async () => {
-            const result = await ProductService.getPoint(data.productId);
-            setPoint(result.data);
-            return result.data;
-        };
-        fetchApiGetPoint();
-    }, []);
+    // useEffect(() => {
+    //     const fetchApiGetPoint = async () => {
+    //         const result = await ProductService.getPoint(data.productId);
+    //         setPoint(result.data);
+    //         return result.data;
+    //     };
+    //     fetchApiGetPoint();
+    // }, []);
 
     return (
         <tr>

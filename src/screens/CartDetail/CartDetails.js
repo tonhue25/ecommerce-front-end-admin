@@ -19,7 +19,7 @@ function CartDetails() {
     const [dataEmployees, setDataEmployees] = useState([]);
     const [isUpdate, setIsUpdate] = useState(false);
     const [cart, setCart] = useState();
-    const [searchState, setSearchState] = useState('shipping001');
+    const [searchState, setSearchState] = useState();
 
     // get employees in shipping department
     useEffect(() => {
@@ -31,6 +31,7 @@ function CartDetails() {
                 .then(function (response) {
                     if (response.data.http_code == constant.SUCCESS) {
                         setDataEmployees(response.data.data.list);
+                        setSearchState(response.data.data.list[0].id);
                     }
                 })
                 .catch(function (error) {

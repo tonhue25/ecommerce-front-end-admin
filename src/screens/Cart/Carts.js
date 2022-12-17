@@ -4,7 +4,7 @@ import Moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { user_url } from '../../services/base_url';
-import { CANCEL, DELIVERED, DELIVERING, PAGE_ONE, SUCCESS, WAIT } from '../../services/constant';
+import { CANCEL, DELIVERED, DELIVERING, PAGE_ONE, PAGE_SIZE, SUCCESS, WAIT } from '../../services/constant';
 import { carts, detail_cart, list } from '../../services/link_redirect';
 import * as StateService from '../../services/StateService';
 function Carts() {
@@ -30,25 +30,28 @@ function Carts() {
 
     const [dataSubmitCart, setDataSubmitCart] = useState({
         states: [],
+        size: PAGE_SIZE,
+        page: page,
     });
 
-    const [cart, setCart] = useState([]);
     useEffect(() => {
         dataSubmitCart.states = [searchState];
         if (searchState.length == 0) {
             dataSubmitCart.states = [WAIT, DELIVERING, DELIVERED, CANCEL];
         }
+        dataSubmitCart.page = page;
         axios
             .post(`${user_url}/${carts}/${list}`, dataSubmitCart)
             .then(function (response) {
                 if (response.data.http_code == SUCCESS) {
                     setDataCarts(response.data.data.list);
+                    setTotalPages(response.data.data.totalPages);
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
-    }, [dataSubmitCart, searchState]);
+    }, [dataSubmitCart, searchState, page]);
 
     const showState = () => {
         const Items = [];

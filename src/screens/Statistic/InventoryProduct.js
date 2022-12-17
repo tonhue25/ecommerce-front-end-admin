@@ -9,36 +9,72 @@ import InventoryItem from './InventoryItem';
 
 import { PDFExport } from '@progress/kendo-react-pdf';
 import 'react-datepicker/dist/react-datepicker.css';
+import { public_url } from '../../services/base_url';
+import axios from 'axios';
 function InventoryProduct() {
     const [page, setPage] = useState(PAGE_ONE);
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
-    const [totalPages, setTotalPages] = useState();
-    const [searchValue, setSearchValue] = useState('');
     const [searchCategory, setSearchCategory] = useState('');
     const [itemDisplay, setItemDisplay] = useState(PAGE_SIZE);
 
-    useEffect(() => {
-        const getListProduct = async () => {
-            const result = await ProductService.getListProduct(page, itemDisplay, 0, searchValue, searchCategory);
-            setProducts(result.data.list);
-            setTotalPages(result.data.totalPages);
-            return result.data;
-        };
-        getListProduct();
-    }, [page, itemDisplay, searchValue, searchCategory]);
-
-    function ShowProducts(products) {
-        return products.map((item) => <InventoryItem key={item.id} data={item} />);
-    }
+    const [dataSubmit, setDataSubmit] = useState({
+        size: itemDisplay,
+        page: page,
+        search: '',
+        categoryId: [],
+    });
 
     useEffect(() => {
-        const getAllCategories = async () => {
-            const result = await CategoryService.getAllCategories();
-            setCategories(result.data);
-            return result.data;
+        dataSubmit.categoryId = [];
+        if (searchCategory.length > 0) {
+            dataSubmit.categoryId = [searchCategory];
+        }
+        dataSubmit.page = page;
+        dataSubmit.size = itemDisplay;
+        const getListEmployee = async () => {
+            axios
+                .post(`${public_url}/products`, dataSubmit)
+                .then(function (response) {
+                    if (response.data.http_code == 'SUCCESS') {
+                        setProducts(response.data.data);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         };
-        getAllCategories();
+        getListEmployee();
+    }, [dataSubmit, searchCategory, page, itemDisplay]);
+
+    // function ShowProducts(products) {
+    //     return products.map((item) => <InventoryItem key={item.id} data={item} />);
+    // }
+
+    const ShowProducts = (products) => {
+        if (products.size > 0) {
+            const Items = [];
+            for (let i = 0; i < products.size; i++) {
+                Items.push(<InventoryItem key={products.list[i].id} data={products.list[i]} />);
+            }
+            return Items;
+        }
+    };
+
+    useEffect(() => {
+        const getCategories = async () => {
+            axios
+                .post(`${public_url}/categories`, {})
+                .then(function (response) {
+                    if (response.data.http_code == 'SUCCESS') {
+                        setCategories(response.data.data.list);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        };
+        getCategories();
     }, []);
 
     const handleChangeCategory = (e) => {
@@ -112,25 +148,6 @@ function InventoryProduct() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    {/* <div className="row">
-                                        <div className="col-md-6 col-lg-4">
-                                            <div className="input-icon">
-                                                <input
-                                                    value={searchValue}
-                                                    onChange={(e) => setSearchValue(e.target.value)}
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Nhập tên sản phẩm..."
-                                                />
-                                                <span className="input-icon-addon">
-                                                    <i className="fa fa-search" />
-                                                </span>
-                                            </div>
-                                        </div> 
-                                        <br />
-                                        <div className="col-md-4 col-lg-6"></div>
-                                        <br />
-                                    </div>*/}
                                     <PDFExport ref={pdfExportComponent} paperSize="A3">
                                         <div className="row mt-5">
                                             <div className="col-md-12 col-lg-12">
@@ -154,10 +171,10 @@ function InventoryProduct() {
                                         </div>
                                     </PDFExport>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        {totalPages > 1 ? (
+                                        {products.totalPages > 1 ? (
                                             <Pagination
                                                 color="primary"
-                                                count={totalPages}
+                                                count={products.totalPages}
                                                 size="large"
                                                 page={page}
                                                 showFirstButton

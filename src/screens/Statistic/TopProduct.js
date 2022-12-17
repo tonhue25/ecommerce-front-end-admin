@@ -204,7 +204,7 @@ function TopProduct() {
                                                                 <td>
                                                                     {
                                                                         JSON.parse(localStorage.getItem('accessToken'))
-                                                                            .name
+                                                                            .data.account.name
                                                                     }
                                                                 </td>
                                                             </tr>

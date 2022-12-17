@@ -10,8 +10,9 @@ import { SUCCESS } from '../../services/constant';
 import * as OrderDetailService from '../../services/OrderDetailService';
 import * as SupplierService from '../../services/SupplierService';
 import Redirect from '../../utils/Redirect';
-import Toast from '../../utils/Toast';
+import Toast, { toast_error, toast_success } from '../../utils/Toast';
 import ProductItem from '../Order/ProductItem';
+import Moment from 'moment';
 function DetailOrder() {
     let { id } = useParams();
 
@@ -20,7 +21,9 @@ function DetailOrder() {
     const [endDate, setEndDate] = useState(new Date());
 
     const [categoryId, setCategoryId] = useState();
+    const [supplierId, setSupplierId] = useState();
 
+    // create or update detail order
     const [dataDetailOrder, setDataDetailOrder] = useState({
         orderId: id,
         productId: '',
@@ -28,23 +31,35 @@ function DetailOrder() {
         price: '',
         signal: '',
     });
-    // get order and order detail.
+    // create or update order
+    const [dataOrder, setDataOrder] = useState({
+        id: '',
+        purchaseDate: '',
+        employeeId: '',
+        supplierId: '',
+    });
+    // get order and order detail. => update.
     const [data, setData] = useState();
     useEffect(() => {
-        const getOrderDetails = async () => {
-            axios
-                .get(`http://localhost:8080/api/admin/orders/${id}`)
-                .then(function (response) {
-                    if (response.data.http_code == SUCCESS) {
-                        setData(response.data.data);
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        };
-        getOrderDetails();
-    }, [isReload, id]);
+        if (id || dataOrder.id) {
+            const getOrderDetails = async () => {
+                axios
+                    .get(`http://localhost:8080/api/admin/orders/${id || dataOrder.id}`)
+                    .then(function (response) {
+                        if (response.data.http_code == SUCCESS) {
+                            setData(response.data.data);
+                            setDataOrder(response.data.data);
+                        } else {
+                            Toast(toast_error, 'An error occurred! Please try again!');
+                        }
+                    })
+                    .catch(function (error) {
+                        Toast(toast_error, 'An error occurred! Please try again!');
+                    });
+            };
+            getOrderDetails();
+        }
+    }, [isReload, id, dataOrder.id]);
 
     // display order and order detail.
     const showData = (data) => {
@@ -72,6 +87,11 @@ function DetailOrder() {
         const getSuppliers = async () => {
             const result = await SupplierService.getAllSuppliers();
             setSuppliers(result.data);
+            if (data) {
+                setSupplierId(data.supplierId);
+            } else {
+                setSupplierId(result.data[0].id);
+            }
         };
         getSuppliers();
     }, [data]);
@@ -79,21 +99,21 @@ function DetailOrder() {
     // get category by supplier
     const [categories, setCategories] = useState([]);
     useEffect(() => {
-        if (data) {
+        if (suppliers && supplierId) {
             const getCategoryBySupplier = async () => {
                 axios
-                    .get(`http://localhost:8080/api/admin/suppliers/${data.supplier.id}`)
+                    .get(`http://localhost:8080/api/admin/suppliers/${supplierId}`)
                     .then(function (response) {
                         setCategories(response.data);
                         setCategoryId(response.data[0].categoryId);
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        Toast(toast_error, 'An error occurred! Please try again!');
                     });
             };
             getCategoryBySupplier();
         }
-    }, [suppliers]);
+    }, [suppliers, supplierId]);
 
     // get product of category.
     useEffect(() => {
@@ -102,16 +122,20 @@ function DetailOrder() {
                 axios
                     .get(`http://localhost:8080/api/public/categories/${categoryId}`)
                     .then(function (response) {
-                        setProducts(response.data.data.products);
-                        dataDetailOrder.productId = response.data.data.products[0].id;
+                        if (response.data.http_code == SUCCESS) {
+                            setProducts(response.data.data.products);
+                            dataDetailOrder.productId = response.data.data.products[0].id;
+                        } else {
+                            Toast(toast_error, 'An error occurred! Please try again!');
+                        }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        Toast(toast_error, 'An error occurred! Please try again!');
                     });
             };
             getProductByCategory();
         }
-    }, [categories, categoryId]);
+    }, [categories]);
 
     const handleClickCancel = (e) => {
         e.preventDefault();
@@ -129,23 +153,35 @@ function DetailOrder() {
     };
 
     const deleteProduct = (orderId, productId) => {
+        setIsReload(true);
         const deleteItem = async () => {
+            setIsReload(false);
             await OrderDetailService.deleteItem(orderId, productId);
             setIsReload(true);
             Toast('success', 'Đã xóa sản phẩm!!');
+            setIsReload(false);
         };
         deleteItem();
+        setIsReload(true);
     };
 
     const onChangedataDetailOrder = (e) => {
         setDataDetailOrder({ ...dataDetailOrder, [e.target.name]: e.target.value });
     };
+
+    const onChangedataOrder = (e) => {
+        setDataOrder({ ...dataOrder, [e.target.name]: e.target.value });
+    };
+
     const [signal, setSignal] = useState(false);
     const handleSubmitDetailOrder = (e) => {
+        setIsReload(true);
         e.preventDefault();
-        console.log(dataDetailOrder);
         if (id != null) {
             dataDetailOrder.orderId = id;
+        }
+        if (dataOrder.id) {
+            dataDetailOrder.orderId = dataOrder.id;
         }
         if (signal) {
             dataDetailOrder.signal = 'update';
@@ -156,13 +192,21 @@ function DetailOrder() {
         axios
             .post(url, dataDetailOrder)
             .then((response) => {
-                setIsReload(true);
-                Toast('success', 'Chỉnh sửa thành công!');
+                if (response.data.http_code == SUCCESS) {
+                    setIsReload(true);
+                    Toast(toast_success, 'Success!');
+                    setIsReload(false);
+                } else {
+                    setIsReload(true);
+                    Toast(toast_error, 'An error occurred! Please try again!');
+                    setIsReload(false);
+                }
             })
             .catch((error) => {
-                Toast('error', 'Có lỗi xảy ra! Vui lòng thử lại!');
+                setIsReload(true);
+                Toast(toast_error, 'An error occurred! Please try again!');
+                setIsReload(false);
             });
-        setIsReload(false);
     };
 
     const updateData = (data) => {
@@ -172,6 +216,36 @@ function DetailOrder() {
         };
         updateData();
     };
+
+    const handleSubmitOrder = (e) => {
+        e.preventDefault();
+        if (id) {
+            dataOrder.id = id;
+        }
+        if (!dataOrder.supplierId) {
+            dataOrder.supplierId = supplierId;
+        }
+        dataOrder.employeeId = JSON.parse(localStorage.getItem('accessToken')).data.account.id;
+        dataOrder.purchaseDate = endDate;
+        console.log(dataOrder);
+        const url = `${admin_url}/orders`;
+        axios
+            .post(url, dataOrder)
+            .then((response) => {
+                if (response.data.http_code == SUCCESS) {
+                    Toast(toast_success, 'Success!');
+                    id = response.data.data.id;
+                    setDataOrder(response.data.data);
+                    dataDetailOrder.orderId = response.data.data.id;
+                } else {
+                    Toast(toast_error, 'An error occurred! Please try again!');
+                }
+            })
+            .catch((error) => {
+                Toast(toast_error, 'An error occurred! Please try again!');
+            });
+    };
+
     return (
         <div className="main-panel">
             <ToastContainer />
@@ -191,18 +265,17 @@ function DetailOrder() {
                                                         className="form-control"
                                                         type="text"
                                                         name="id"
-                                                        value={data ? data.id : ''}
+                                                        value={id || dataOrder.id || ''}
+                                                        onChange={onChangedataOrder}
                                                     />
                                                 </div>
                                                 <div className="form-group">
-                                                    <label htmlFor="id">Purchase Date</label>
-                                                    <DatePicker
-                                                        style={{ cursor: 'pointer' }}
-                                                        placeholderText="dd/mm/yyyy"
-                                                        dateFormat="dd/MM/yyyy"
+                                                    <input
                                                         className="form-control"
-                                                        value={data ? data.purchaseDate : new Date()}
-                                                        onChange={(date: Date) => setEndDate(date)}
+                                                        type="date"
+                                                        name="purchaseDate"
+                                                        defaultValue={dataOrder.purchaseDate || ''}
+                                                        onChange={(e) => setEndDate(e.target.value)}
                                                     />
                                                 </div>
                                             </div>
@@ -214,15 +287,17 @@ function DetailOrder() {
                                                             // disabled={isReload ? false : true}
                                                             className="form-control form-control"
                                                             name="supplierId"
+                                                            onChange={(e) => setSupplierId(e.target.value)}
                                                         >
                                                             {suppliers.map((item) => (
                                                                 <option
                                                                     key={item.id}
                                                                     value={item.id}
                                                                     name="supplierId"
-                                                                    selected={
-                                                                        data ? item.id === data.supplier.id : <></>
-                                                                    }
+                                                                    // selected={
+                                                                    //     data ? item.id === data.supplier.id : <></>
+                                                                    // }
+                                                                    selected={item.id == supplierId ? true : false}
                                                                 >
                                                                     {item.id + ' - ' + item.name}
                                                                 </option>
@@ -256,7 +331,7 @@ function DetailOrder() {
                                                 <button
                                                     type="submit"
                                                     className="btn btn-success"
-                                                    // onClick={handleSubmitOrder}
+                                                    onClick={handleSubmitOrder}
                                                 >
                                                     Add
                                                 </button>

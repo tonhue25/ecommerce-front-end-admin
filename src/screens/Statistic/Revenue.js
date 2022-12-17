@@ -57,29 +57,6 @@ function Revenue() {
         }
     };
 
-    // function countDate() {
-    //     if (yearEnd === yearStart) {
-    //         let count = parseInt(monthEnd) - parseInt(monthStart);
-    //         setCount(count);
-    //         for (let i = monthStart; i < monthEnd; i++) {
-    //             console.log(i);
-    //         }
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     if (yearEnd === yearStart) {
-    //         let count = parseInt(monthEnd) - parseInt(monthStart);
-    //         setCount(count);
-    //         for (let i = monthStart; i < monthEnd; i++) {
-    //             console.log(i);
-    //         }
-    //     }
-    //     if (yearEnd > yearStart) {
-    //         setCount(12);
-    //     }
-    // }, [startDate, endDate]);
-
     function ShowData(count) {
         if (count > 0) {
             const Items = [];
@@ -228,7 +205,7 @@ function Revenue() {
                                                                 <td>
                                                                     {
                                                                         JSON.parse(localStorage.getItem('accessToken'))
-                                                                            .name
+                                                                            .data.account.name
                                                                     }
                                                                 </td>
                                                             </tr>

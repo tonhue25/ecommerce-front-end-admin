@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PAGE_ONE, PAGE_SIZE, SUCCESS } from '../../services/constant';
+import Moment from 'moment';
 function Orders() {
     const [page, setPage] = useState(PAGE_ONE);
     const [totalPages, setTotalPages] = useState();
@@ -93,7 +94,7 @@ function Orders() {
                                                 {orders.map((item) => (
                                                     <tr key={item.id}>
                                                         <td>{item.id}</td>
-                                                        <td>{item.purchaseDate}</td>
+                                                        <td>{Moment(item.purchaseDate).format('DD/MM/yyyy')}</td>
                                                         <td>{item.supplier.name}</td>
                                                         <td>{item.employee.name}</td>
                                                         <td>
