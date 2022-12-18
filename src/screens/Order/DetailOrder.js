@@ -135,7 +135,7 @@ function DetailOrder() {
             };
             getProductByCategory();
         }
-    }, [categories]);
+    }, [categories, categoryId]);
 
     const handleClickCancel = (e) => {
         e.preventDefault();

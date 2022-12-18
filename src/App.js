@@ -30,6 +30,7 @@ import InventoryProduct from './screens/Statistic/InventoryProduct';
 import Revenue from './screens/Statistic/Revenue';
 import TopProduct from './screens/Statistic/TopProduct';
 import Warranty from './screens/Warranty/Warranty';
+import Shippings from './screens/EmployeeShipping/Shippings';
 import {
     carts,
     categories,
@@ -84,6 +85,8 @@ function App() {
 
                     <Route path={carts} element={<Carts />}></Route>
                     <Route path={`${detail_cart}/:id`} element={<CartDetails />}></Route>
+
+                    <Route path={'shippings'} element={<Shippings />}></Route>
                     <Route path={'detail-shipping/:id'} element={<CartDetailsShipping />}></Route>
 
                     <Route path={'invoice/:id'} element={<Invoice />}></Route>

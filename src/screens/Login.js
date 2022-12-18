@@ -31,6 +31,9 @@ function Login({ setAccessToken }) {
                     if (response.data.http_code === 'SUCCESS') {
                         localStorage.setItem('accessToken', JSON.stringify(response.data));
                         setAccessToken(localStorage.getItem('accessToken'));
+                        if (JSON.parse(localStorage.getItem('accessToken')).data.account.department.id == 'shipping') {
+                            Redirect('/shippings');
+                        }
                     }
                 })
                 .catch(function (error) {
